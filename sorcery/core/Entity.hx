@@ -42,7 +42,8 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	public var fullName(get, never) : String;
 	public var group(get, null) : IEntityGroup;
 	public var agenda(get, never) : IAgendaManager;
-	public var enabled(get, set) : Bool;
+	@:isVar
+	public var enabled(get, set) : Bool = true;
 
 	var _pool : IPool;
 
@@ -51,7 +52,6 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	//CHILDREN
 	var _children : Array<IEntityChild>;
 	var _childrenByName : Map<String, IEntityChild>;
-	var _enabled = true;
 
 	var _activeAgendas:Array<String>;
 
@@ -84,17 +84,17 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 
 	function get_enabled():Bool
 	{
-		return _enabled;
+		return enabled;
 	}
 
 	function set_enabled(value : Bool) : Bool
 	{
-		if (_enabled == value)
+		if (enabled == value)
 		{
 			return value;
 		}
 
-		_enabled = value;
+		enabled = value;
 
 		updateActiveState();
 		return value;
