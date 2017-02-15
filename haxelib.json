@@ -1,5 +1,5 @@
 {
-	"name" : "sorcery_core",
+	"name" : "sorcery-core",
 	"url" : "",
 	"license" : "MIT",
     "description" : "Component based engine",
