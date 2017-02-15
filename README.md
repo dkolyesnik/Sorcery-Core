@@ -1,6 +1,6 @@
-# Sorcery 
+# Sorcery Core
 
-core
+Component base engine, minimalistic core for the game framework Sorcery (will be added later)
 
-Minimalistic component based engine.
+
 
