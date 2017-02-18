@@ -5,13 +5,13 @@ package sorcery.core;
 import sorcery.core.Behavior;
 import sorcery.core.abstracts.EventType;
 import sorcery.core.interfaces.IEntity;
-import de.polygonal.ds.Map;
 
 import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.IBundle;
 import sorcery.core.interfaces.IEntityChildLink;
 
+@:autoBuild(sorcery.core.macros.BundleBuildMacro.build())
 class Bundle extends Behavior implements IBundle
 {
 	@:noCompletion
@@ -24,14 +24,19 @@ class Bundle extends Behavior implements IBundle
 	public function new()
 	{
 		super(null);
-		setupName();
+		setupBundleName();
 		setupRequirements();
 		setupDelayedInitialization();
 	}
 	
-	function setupName():Void
+	function onInitialize():Void
 	{
-		//need to be overriden
+		//override to add entities and so on
+	}
+	
+	function setupBundleName():Void
+	{
+		//override to setip Bundle name, or do not override and it will be created by macros
 	}
 	
 	function setupRequirements():Void
@@ -60,11 +65,6 @@ class Bundle extends Behavior implements IBundle
 			_initializationComplete();
 	}
 
-	function onInitialize():Void
-	{
-		//override to add entities and so on
-	}
-
 	function checkRequirements():Void
 	{
 		for (bundleName in _requirements)
@@ -79,9 +79,10 @@ class Bundle extends Behavior implements IBundle
 		_waitingForInitialization.push(new WaitForInit(requiredBundles, action));
 	}
 	
-	function requiresBundle(bundleName:String):Void
+	function requiresBundles(bundles:Array<String>):Void
 	{
-		_requirements.push(bundleName);
+		for (bundleName in bundles)
+			_requirements.push(bundleName);
 	}
 
 	@:noCompletion

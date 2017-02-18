@@ -20,7 +20,7 @@ import sorcery.core.interfaces.ISystemNode;
 @:autoBuild(sorcery.core.macros.SystemNodeBuildMacro.build())
 class SystemNode extends Behavior implements ISystemNode
 {
-	public var nodeName(get, set):String;
+	public var nodeName(get, null):String;
 	
 	var list(get, null):NodeList;
 	var next(get, null):ISystemNode;
@@ -85,9 +85,4 @@ class SystemNode extends Behavior implements ISystemNode
 		return nodeName;
 	}
 	
-	function set_nodeName(value:String):String 
-	{
-		if(!_isAddedToRoot)
-			return nodeName = value;
-	}
 }
