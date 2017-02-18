@@ -11,6 +11,10 @@ interface ICore
     var root(get, null) : IEntityRoot;    
     var framework(get, null):IFramework;
     var time(get, null) : ITime;    
+	
+	function addBundles(pack:BundlePack):Void;
+	function removeBundles(pack:BundlePack):Void;
+	
     
 	@:allow(sorcery.core.interfaces.IEntity)
 	@:allow(sorcery.core.interfaces.IBehavior)

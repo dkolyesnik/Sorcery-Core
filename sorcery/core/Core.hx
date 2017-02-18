@@ -26,44 +26,53 @@ class Core implements ICore implements HaxeContracts
     var notificator(get, null) : INotificator;
 	var factory(get, null) : ICoreFactory;
 
-	private var _setup:CoreSetup;
-    
-    public function new(setup:CoreSetup)
+	var _bundlesEntity:IEntity;
+	
+    public function new(?p_factory:ICoreFactory)
     {
-		Contract.requires(setup != null);
-		
-		_setup = setup;
+		if (p_factory == null)
+			factory = new CoreFactory();
+		else
+			factory = p_factory;
 		
 		_initialize();
     }
     
     function _initialize() : ICore
     {
-		if (_setup.factory == null)
-			factory = new CoreFactory();
-		else
-			factory = _setup.factory;
-        
         factory.initialize(this);
 
         _createAll();
 		
-		var bundlesEntity = allocateEntity("bundles");
-		root.addChild(bundlesEntity);
-		for (bundle in _setup._bundles)
+		_bundlesEntity = allocateEntity("bundles");
+		root.addChild(_bundlesEntity);
+		
+        return this;
+    }
+	
+	public function addBundles(pack:BundlePack):Void
+	{
+		for (bundle in pack._bundles)
 		{
 			//adding as a child, so bundle will have core access
-			bundlesEntity.addChild(bundle);
+			_bundlesEntity.addChild(bundle);
 		}
         
-		for (bundle in _setup._bundles)
+		for (bundle in pack._bundles)
 		{
 			//bundles asks parent if required bundles are added
 			bundle.initialize();
 		}
-		
-        return this;
-    }
+	}
+	
+	public function removeBundles(pack:BundlePack):Void
+	{
+		for (bundle in pack._bundles)
+		{
+			//adding as a child, so bundle will have core access
+			_bundlesEntity.removeChild(bundle);
+		}
+	}
     
     private function _createAll() : Void
     {

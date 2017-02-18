@@ -10,17 +10,15 @@ import sorcery.core.interfaces.ICore;
  * @author Dmitriy Kolyesnik
  */
 @:allow(sorcery.core.interfaces.ICore)
-class CoreSetup implements HaxeContracts
+class BundlePack implements HaxeContracts
 {
-	public var factory:ICoreFactory;
-
 	var _bundles:Array<IBundle> = [];
 
 	public function new()
 	{
 
 	}
-
+	
 	public function addBundle(bundle:IBundle):Void
 	{
 		if (_bundles.indexOf(bundle) >= 0)
