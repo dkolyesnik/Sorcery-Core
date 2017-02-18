@@ -9,6 +9,7 @@ import sorcery.core.interfaces.ICorePluginManager;
 import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.IEntityGroup;
 import sorcery.core.interfaces.IEntityRoot;
+import sorcery.core.interfaces.IFramework;
 import sorcery.core.interfaces.INotificator;
 import sorcery.core.interfaces.ITime;
 import haxecontracts.Contract;
@@ -19,6 +20,7 @@ import haxecontracts.HaxeContracts;
 class Core implements ICore implements HaxeContracts
 {
     public var root(get, null) : IEntityRoot;
+	public var framework(get, null):IFramework;
     public var time(get, null) : ITime;
 	
     var notificator(get, null) : INotificator;
@@ -68,6 +70,7 @@ class Core implements ICore implements HaxeContracts
         notificator = factory.createNotificator();
         time = factory.createTime();
         root = factory.createRoot();
+		framework = factory.createFramework();
     }
     
     public function allocateEntity(?name:String) : IEntity
@@ -103,6 +106,11 @@ class Core implements ICore implements HaxeContracts
 	public function get_factory():ICoreFactory
 	{
 		return factory;
+	}
+	
+	function get_framework():IFramework 
+	{
+		return framework;
 	}
 }
 

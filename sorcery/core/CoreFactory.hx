@@ -6,6 +6,7 @@ package sorcery.core;
 import sorcery.core.interfaces.IAgendaManager;
 import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.ICoreFactory;
+import sorcery.core.interfaces.IFramework;
 import sorcery.core.interfaces.IPool;
 import sorcery.core.interfaces.IPoolable;
 import sorcery.core.interfaces.IEntity;
@@ -33,6 +34,11 @@ class CoreFactory implements ICoreFactory
 		}
 		_core = p_core;
 		_entityPool = _createEntityPool();
+	}
+	
+	public function createFramework():IFramework
+	{
+		return new Framework(_core);
 	}
 
 	public function createNotificator() : INotificator

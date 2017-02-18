@@ -9,7 +9,7 @@ import sorcery.core.interfaces.IAgendaManager;
 interface ICore
 {
     var root(get, null) : IEntityRoot;    
-    
+    var framework(get, null):IFramework;
     var time(get, null) : ITime;    
     
 	@:allow(sorcery.core.interfaces.IEntity)
