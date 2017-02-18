@@ -11,6 +11,7 @@ import haxecontracts.HaxeContracts;
  */
 
 @:allow(sorcery.core.misc.NodeList)
+
 @:generic
 class NodeIterator<T:ISystemNode> implements INodeIterator implements HaxeContracts
 {

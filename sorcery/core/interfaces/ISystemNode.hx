@@ -9,7 +9,7 @@ import sorcery.core.misc.NodeList;
 @:allow(sorcery.core.misc.NodeIterator)
 interface ISystemNode extends IBehavior
 {
-	var nodeName(get, null):String;
+	var nodeName(get, set):String;
 	
 	private var list(get, null):NodeList;
 	private var next(get, null):ISystemNode;

@@ -44,6 +44,15 @@ class Behavior extends Component implements IBehavior implements HaxeContracts
 		}
 		return cast link;
 	}
+	
+	function destroyLink(link:IEntityChildLink):Void
+	{
+		Contract.requires(link != null);
+
+		var internalLink:ILinkInternal = cast link;
+		if (_links.remove(internalLink))
+			internalLink.destroy();
+	}
 
 	inline function _resolveLinks():Void
 	{

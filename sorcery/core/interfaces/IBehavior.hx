@@ -14,6 +14,7 @@ interface IBehavior extends IComponent
 	function addHandler(handler:HandlerData):HandlerData;
 	function removeHandler(handler:HandlerData):Void;
 
-	private function createLink(path:Path):IEntityChildLink;    
+	private function createLink(path:Path):IEntityChildLink; 
+	private function destroyLink(link:IEntityChildLink):Void;
 }
 

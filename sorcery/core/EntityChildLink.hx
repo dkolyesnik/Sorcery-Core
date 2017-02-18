@@ -37,6 +37,7 @@ class EntityChildLink implements IEntityChildLink implements ILinkInternal imple
 	public function destroy():Void
 	{
 		//TODO
+		reset();
 	}
 
 	function resolve():Void

@@ -13,7 +13,7 @@ class Time implements ITime
 
 	public var fps(get, null) : Int = 0;
 	public var dt(get, null) : Float = 0.0;
-	public var isStarted(get, null) : Bool = false;
+	public var isStarted(get, null) : Bool = true;
 	@:isVar
 	public var timeScale(get, set) : Float = 1.0;
 	public var lifeTime(get, null) : Float = 0.0;

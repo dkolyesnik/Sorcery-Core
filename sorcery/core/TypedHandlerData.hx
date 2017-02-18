@@ -12,7 +12,9 @@ import haxecontracts.HaxeContracts;
  * ...
  * @author Dmitriy Kolyesnik
  */
-@:generic
+#if !cs
+ @:generic
+ #end
 class TypedHandlerData<T:IEvent> extends HandlerData implements HaxeContracts
 {
 	var _handler:T->Void;

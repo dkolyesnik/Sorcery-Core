@@ -3,7 +3,7 @@ package sorcery.core.interfaces;
 /**
  * @author Dmitriy Kolyesnik
  */
-@:allow(sorcery.core.interfaces.IComponent)
+@:allow(sorcery.core.interfaces.IBehavior)
 interface ILinkInternal 
 {
 	function destroy():Void;
