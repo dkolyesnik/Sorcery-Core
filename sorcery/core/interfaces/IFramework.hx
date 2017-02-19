@@ -7,6 +7,6 @@ import sorcery.core.interfaces.IEntityChild;
  */
 interface IFramework 
 {
-	function setObj<T:IEntityChild>(name:FrameworkObjName<T>, obj:T):Void;
-	function getObj<T:IEntityChild>(name:FrameworkObjName<T>):T;
+	function setObj<T>(name:FrameworkObjName<T>, obj:T):Void;
+	function getObj<T>(name:FrameworkObjName<T>):T;
 }

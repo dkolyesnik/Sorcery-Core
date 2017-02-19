@@ -5,7 +5,7 @@ import sorcery.core.interfaces.IEntityChild;
  * ...
  * @author Dmitriy Kolesnik
  */
-abstract FrameworkObjName<T:IEntityChild>(String) to String
+abstract FrameworkObjName<T>(String) to String
 {
 	inline public function new(s:String)
 	{

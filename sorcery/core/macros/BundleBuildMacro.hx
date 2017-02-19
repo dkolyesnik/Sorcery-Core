@@ -25,12 +25,13 @@ class BundleBuildMacro
 			else if (f.name == setupBundleNameMethodName)
 				setupMethod = f;
 		}
+		
 		var name:String = localClassName;
 		//if has Bundle in class name
 		if(name.substr(name.length - 6) == "Bundle")
 		{
 			name = name.substr(0, name.length - 6);
-			if (nameField == null && setupMethod == null)
+			if (nameField == null)
 			{
 				nameField = {
 					name: "NAME",
@@ -40,7 +41,13 @@ class BundleBuildMacro
 					pos: Context.currentPos()
 				}
 				fields.push(nameField);
-				
+			}
+			else
+			{
+				trace('NAME field is found, do not generating field in class $localClassName');
+			}
+			if (setupMethod == null)
+			{
 				setupMethod = {
 					name:setupBundleNameMethodName,
 					access:[Access.AOverride, Access.APrivate],
@@ -55,7 +62,7 @@ class BundleBuildMacro
 			}
 			else
 			{
-				trace('NAME field or method $setupBundleNameMethodName is found, do not generating field in class $localClassName');
+				trace('Method $setupBundleNameMethodName is found, do not generating field in class $localClassName');
 			}
 		}
 		else
