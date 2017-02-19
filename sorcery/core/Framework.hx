@@ -28,7 +28,6 @@ class Framework implements IFramework implements HaxeContracts
 		Contract.requires(obj != null);
 		Contract.requires(Std.is(obj, IEntityChild));
 		
-		
 		rootEntity.addChild(cast obj);
 	}
 	

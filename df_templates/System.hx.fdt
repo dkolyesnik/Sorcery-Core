@@ -1,0 +1,24 @@
+package $(Package);
+
+import sorcery.core.BaseSystem;
+import sorcery.core.CoreEvent;
+
+/**
+$(CBI)* ...
+$(CBI)* @author $(DefaultUser)
+$(CBI)*/
+class $(FileName) extends BaseSystem $(CSLB){
+/*
+	mark NodeListLink with metadata
+	@:sorcery_node("nodeName", true/false if need to prepare)
+*/
+	public function new(p_core:ICore, priority:Int = 0) $(CSLB){
+		super(p_core, priority);
+		$(EntryPoint)
+	}
+	
+	override function update(e:CoreEvent):Void 
+	{
+		
+	}
+}

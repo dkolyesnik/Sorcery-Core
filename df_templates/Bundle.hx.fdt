@@ -1,0 +1,32 @@
+package $(Package);
+
+import sorcery.core.Bundle;
+
+/**
+$(CBI)* ...
+$(CBI)* @author $(DefaultUser)
+$(CBI)*/
+class $(FileName) extends Bundle $(CSLB){
+
+	public function new() $(CSLB){
+		super();
+	}
+	
+	override function onInitialize():Void
+	{
+		//executed when Bundle is initialized
+		$(EntryPoint)
+	}
+	
+	override function setupRequirements():Void
+	{
+		//names of required Bundles
+		requiresBundles([]);
+	}
+	
+	override function setupDelayedInitialization():Void
+	{
+		//setup initialization
+		//waitsFor([/*events*/], /* function */);
+	}
+}
