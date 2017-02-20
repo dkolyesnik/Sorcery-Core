@@ -141,11 +141,11 @@ class SystemNodeBuildMacro
 			prepareExprArray = [macro var temp = true];
 		else
 			prepareExprArray = [macro var temp = super.$prepareFuncName()];
-		//if (privatePrepareField != null)
-		//{
-			//var privatePrepareFieldName = privatePrepareField.name;
-			//prepareExprArray.push(macro { temp = temp && this.$privatePrepareFieldName(); });
-		//}
+		if (privatePrepareField != null)
+		{
+			var privatePrepareFieldName = privatePrepareField.name;
+			prepareExprArray.push(macro { temp = temp && this.$privatePrepareFieldName(); });
+		}
 		prepareField = {
 			name:prepareFuncName,
 			access:[APublic, AOverride],
@@ -157,9 +157,6 @@ class SystemNodeBuildMacro
 			pos:Context.currentPos()
 		}
 		fieldsArray.push(prepareField);
-		
-			//log('$prepareFuncName is found');
-			//prepareExprArray = getExprArray(prepareField);
 		
 		var unprepareExprArray:Array<Expr>;
 		if (unprepareField == null)

@@ -3,6 +3,7 @@ import haxe.macro.Context;
 import haxe.macro.Expr.Access;
 import haxe.macro.Expr.Field;
 import haxe.macro.Expr.FieldType;
+import sorcery.core.abstracts.ComponentName;
 
 /**
  * ...
@@ -30,7 +31,7 @@ class BundleBuildMacro
 		//if has Bundle in class name
 		if(name.substr(name.length - 6) == "Bundle")
 		{
-			name = name.substr(0, name.length - 6);
+			name = ComponentName.PREFIX + name.substr(0, name.length - 6);
 			if (nameField == null)
 			{
 				nameField = {

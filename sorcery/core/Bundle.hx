@@ -10,6 +10,9 @@ import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.IBundle;
 import sorcery.core.interfaces.IEntityChildLink;
+import sorcery.core.misc.Pair;
+
+typedef WaitForInit = Pair<Array<String>, Void->Void>;
 
 @:autoBuild(sorcery.core.macros.BundleBuildMacro.build())
 class Bundle extends Behavior implements IBundle
@@ -92,11 +95,11 @@ class Bundle extends Behavior implements IBundle
 		while (i --> 0)
 		{
 			var waitData = _waitingForInitialization[i];
-			if (waitData.requiredBundles.remove(e.subType)
-					&& waitData.requiredBundles.length == 0)
+			if (waitData.a.remove(e.subType)
+					&& waitData.a.length == 0)
 			{
 				_waitingForInitialization.splice(i, 1);
-				waitData.action();
+				waitData.b();
 			}
 		}
 
@@ -115,31 +118,5 @@ class Bundle extends Behavior implements IBundle
 	}
 }
 
-private class WaitForInit
-{
-	public var requiredBundles:Array<String>;
-	public var action:Void->Void;
-	public function new(p_requiredBundles:Array<String>, p_action:Void->Void)
-	{
-		requiredBundles = p_requiredBundles;
-		action = p_action;
-	}
-}
 
-class BundleEvent extends Event
-{
-	/**
-	 * sent when bundle is initialized
-	 */
-	inline static public var BUNDLE = new EventType<BundleEvent>("bundle");
-
-	public var subType(default, null):String;
-
-	public function new(p_subType:String)
-	{
-		super(BUNDLE);
-		subType = p_subType;
-	}
-
-}
 
