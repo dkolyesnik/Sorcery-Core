@@ -6,7 +6,7 @@ import sorcery.core.interfaces.IAgendaChild;
 import sorcery.core.interfaces.IAgendaManager;
 
 @:allow(sorcery.core.interfaces.IEntityGroup)
-interface IEntity extends IAgendaChild extends IEventSender
+interface IEntity extends IAgendaChild extends IEventSender extends IParent
 {
 	var fullName(get, never) : String;
 	var group(get, null) : IEntityGroup;
@@ -15,15 +15,6 @@ interface IEntity extends IAgendaChild extends IEventSender
 
 	function isWrapped():Bool;
 	
-	/**
-	 * add child to an Entity
-	 * @param child is any object implementing IEntityChild interface, basicly it is either IEntity or IComponent
-	 * @return child 
-	 */
-	function addChild(child : IEntityChild) : IEntityChild;
-	function removeChild(child : IEntityChild) : IEntityChild;
-	function findChild(p_name : String) : IEntityChild;
-
 	private function onAddToGroup(p_group : IEntityGroup) : Void;
 	private function onRemoveFromGroup() : Void;
 

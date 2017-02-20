@@ -15,8 +15,13 @@ class Event implements IEvent
     {
         _type = p_type;
     }
+	
+	public function reset():Void
+	{
+		
+	}
     
-    private function get_type() : String
+    function get_type() : String
     {
         return _type;
     }
