@@ -27,14 +27,25 @@ class Bundle extends Behavior implements IBundle
 	public function new()
 	{
 		super(null);
+		addHandler(new TypedHandlerData(BundleEvent.CHECK_REQUIREMENTS, createLink("@"), onCheckRequirements));
 		setupBundleName();
 		setupRequirements();
 		setupDelayedInitialization();
 	}
 	
+	function onCheckRequirements(e:Event) 
+	{
+		checkRequirements();
+	}
+	
 	function onInitialize():Void
 	{
 		//override to add entities and so on
+	}
+	
+	function onUninitialize():Void
+	{
+		//override to remove entities and so on
 	}
 	
 	function setupBundleName():Void
@@ -56,6 +67,12 @@ class Bundle extends Behavior implements IBundle
 	{
 		core = p_parent.core;
 		super.onAddedToParent(p_parent);
+	}
+	
+	override function onRemovedFromParent():Void 
+	{
+		onUninitialize();
+		super.onRemovedFromParent();
 	}
 
 	public function initialize():Void

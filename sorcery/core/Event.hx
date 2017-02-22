@@ -5,6 +5,7 @@ package sorcery.core;
 
 import sorcery.core.interfaces.IEvent;
 
+//@:autoBuild(sorcery.core.macros.EventBuildMacro.build())
 class Event implements IEvent
 {
     public var type(get, never) : String;

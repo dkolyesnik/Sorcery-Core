@@ -52,26 +52,21 @@ class Core implements ICore implements HaxeContracts
 	
 	public function addBundles(pack:BundlePack):Void
 	{
+		//adding as a child, so bundle will have core access
 		for (bundle in pack._bundles)
-		{
-			//adding as a child, so bundle will have core access
 			_bundlesEntity.addChild(bundle);
-		}
-        
+
+		//checking requirements and initializing budles
 		for (bundle in pack._bundles)
-		{
-			//bundles asks parent if required bundles are added
 			bundle.initialize();
-		}
 	}
 	
 	public function removeBundles(pack:BundlePack):Void
 	{
+		
 		for (bundle in pack._bundles)
-		{
-			//adding as a child, so bundle will have core access
 			_bundlesEntity.removeChild(bundle);
-		}
+		_bundlesEntity.sendEvent(BundleEvent.getCheckRequirmentsEvent());
 	}
     
     private function _createAll() : Void

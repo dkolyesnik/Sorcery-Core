@@ -18,6 +18,11 @@ class $(FileName) extends Bundle $(CSLB){
 		$(EntryPoint)
 	}
 	
+	override function onUninitialize():Void
+	{
+		//override to remove entities and so on
+	}
+	
 	override function destroy():Void
 	{
 		//destroy all created entities

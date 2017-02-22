@@ -1,0 +1,25 @@
+package $(Package);
+
+import sorcery.core.Event;
+import sorcery.core.abstracts.EventType;
+
+/**
+$(CBI)* ...
+$(CBI)* @author $(DefaultUser)
+$(CBI)*/
+class $(FileName) extends Event $(CSLB){
+/*
+	mark static fields with event names with
+	@:sorcery_single("funcName") if no args name will be generated based on field name
+	or for pool
+	@:sorcery_pool("getResetEvent", 1, ["_","subtype"]) 
+	all params can be skiped, it's function name and pool size
+	EventType supports either Event or current class by now
+	p_type argument is skiped when creating methods
+*/
+	public function new(p_type : String) $(CSLB){
+		super(p_type);
+        $(EntryPoint)
+    }
+	
+}

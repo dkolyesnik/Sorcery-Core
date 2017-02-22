@@ -144,7 +144,7 @@ class SystemNodeBuildMacro
 		if (privatePrepareField != null)
 		{
 			var privatePrepareFieldName = privatePrepareField.name;
-			prepareExprArray.push(macro { temp = temp && this.$privatePrepareFieldName(); });
+			prepareExprArray.push(macro { temp = temp && $i{privatePrepareFieldName}(); });
 		}
 		prepareField = {
 			name:prepareFuncName,
@@ -202,15 +202,15 @@ class SystemNodeBuildMacro
 			if (path.charAt(0) == "-")
 			{
 				var pathVar = path.substr(1);
-				createLinksExpr.push(macro { this.$linkName = createLink(this.$pathVar); });
+				createLinksExpr.push(macro { $i{linkName} = createLink($i{pathVar}); });
 			}
 			else
-				createLinksExpr.push(macro { this.$linkName = createLink($v{path}); });
+				createLinksExpr.push(macro { $i{linkName} = createLink($v{path}); });
 				
-			prepareExprArray.push(macro this.$varName = cast this.$linkName.findChild());
-			prepareExprArray.push(macro temp = this.$varName != null && temp);
+			prepareExprArray.push(macro $i{varName} = cast $i{linkName}.findChild());
+			prepareExprArray.push(macro temp = $i{varName} != null && temp);
 			
-			unprepareExprArray.push(macro this.$varName = null);
+			unprepareExprArray.push(macro $i{varName} = null);
 		}
 		prepareExprArray.push(macro return temp);
 		

@@ -117,23 +117,23 @@ class BaseSystemBuildMacro
 			var className = n.needToPrepare ? "PrepearingNodeIterator" : "NodeIterator";
 			var iteratorTypePath:TypePath = {name: className, pack:nodeListLinkPackage, params:[n.nodeType] };
 			exprArrayCreateNodes.push(macro { 
-										this.$vn = new $typePath(new $iteratorTypePath()); 
+										$i{vn} = new $typePath(new $iteratorTypePath()); 
 									} );
 			if (nn.charAt(0) == "-") //it's a var name and not node name
 			{
 				var varName = nn.substr(1);
 				exprArrayGetNodes.push(macro {
-										this.$vn.setNodeList(core.root.getNodes(this.$varName));
+										$i{vn}.setNodeList(core.root.getNodes($i{varName}));
 										} );
 			}
 			else
 			{
 				exprArrayGetNodes.push(macro {
-										this.$vn.setNodeList(core.root.getNodes($v{nn}));
+										$i{vn}.setNodeList(core.root.getNodes($v{nn}));
 									} );
 			}
 			exprArrayReleaseNodes.push(macro {
-										this.$vn.releaseNodeList();
+										$i{vn}.releaseNodeList();
 									} );
 		}
 		var needSuperCall = Context.getLocalClass().get().superClass.t.get().name != baseSystemClass;

@@ -4,6 +4,7 @@
 package sorcery.core;
 
 import sorcery.core.abstracts.EventType;
+import sorcery.core.abstracts.Priority;
 import sorcery.core.interfaces.IEntityChildLink;
 import haxe.Constraints.Function;
 import sorcery.core.interfaces.IEvent;
@@ -14,7 +15,7 @@ class HandlerData
 {
 
 	public var target(get, never) : String;
-	public var priority(get, null) : Int;
+	public var priority(get, null) : Priority;
 	public var type(get, null) : String;
 
 	var next:HandlerData;
@@ -22,7 +23,7 @@ class HandlerData
 	
 	var _link:IEntityChildLink;
 
-	private function new(p_type : String, p_targetLink : IEntityChildLink, p_priority : Int = 0)
+	private function new(p_type : String, p_targetLink : IEntityChildLink, p_priority : Priority = 0)
 	{
 		type = p_type;
 		_link = p_targetLink;
