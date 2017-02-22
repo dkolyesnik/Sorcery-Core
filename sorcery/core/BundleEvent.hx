@@ -25,7 +25,7 @@ class BundleEvent extends Event
 	}
 
 	static var _checkEvent:Event;
-	public static function getCheckRequirmentsEvent():Event
+	inline public static function getCheckRequirmentsEvent():Event
 	{
 		if (_checkEvent == null)
 			_checkEvent = new Event(CHECK_REQUIREMENTS);
