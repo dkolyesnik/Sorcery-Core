@@ -6,6 +6,10 @@ package sorcery.core.abstracts;
  */
 abstract Priority(Int) from Int to Int
 {
+	//these to for use inside API to be sure that something has ht highes and the lowest prioriy
+	inline public static var LOWEST = MAX + 1;
+	inline public static var HIGHEST = MIN - 1;
+	
 	inline public static var MIN = -30000000;
 	inline public static var MAX = 30000000;
 	
@@ -34,6 +38,6 @@ abstract Priority(Int) from Int to Int
 	
 	public static function validate(value:Int):Bool
 	{
-		return value >= MIN && value <= MAX;
+		return value >= HIGHEST && value <= LOWEST;
 	}
 }
