@@ -12,8 +12,8 @@ abstract FrameworkObjName<T>(String) to String
 		this = s;
 	}
 	
-	//public static function validate(value:String):Bool
-	//{
-		//return EntityName.validate(value) || ComponentName.validate(value);
-	//}
+	public static function validate(value:String):Bool
+	{
+		return EntityName.validate(value) || ComponentName.validate(value);
+	}
 }

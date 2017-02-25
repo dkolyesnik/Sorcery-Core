@@ -14,6 +14,7 @@ interface IEntity extends IAgendaChild extends IEventSender extends IParent
 	var agenda(get, never) : IAgendaManager;
 
 	function isWrapped():Bool;
+	function isGroup():Bool;
 	
 	private function onAddToGroup(p_group : IEntityGroup) : Void;
 	private function onRemoveFromGroup() : Void;

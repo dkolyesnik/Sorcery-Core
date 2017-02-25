@@ -123,6 +123,11 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		return group != null ? group.name == name : false;
 	}
 	
+	public function isGroup():Bool
+	{
+		return false;
+	}
+	
 	override public function destroy() : Void
 	{
 		Contract.ensures(_children.length == 0);

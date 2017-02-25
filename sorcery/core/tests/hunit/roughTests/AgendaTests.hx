@@ -29,25 +29,25 @@ class AgendaTests extends TestCase
 	{
 		var game = core.allocateEntity("game");
 		var gameComp1 = new Component(core);
-		gameComp1.setName("$gc1");
+		gameComp1.setName("gc1");
 		gameComp1.addAgenda("ga1");
 		game.addChild(gameComp1);
 		var gameComp2 = new Component(core);
-		gameComp2.setName("$gc2");
+		gameComp2.setName("gc2");
 		gameComp2.addAgenda("ga2");
 		game.addChild(gameComp2);
 		
 		var player = core.allocateEntity("player");
 		var playerComp1 = new Component(core);
-		playerComp1.setName("$pc");
+		playerComp1.setName("pc");
 		playerComp1.addAgenda("pa1");
 		player.addChild(playerComp1);
 		var playerComp2 = new Component(core);
-		playerComp2.setName("$pc");
+		playerComp2.setName("pc");
 		playerComp2.addAgenda("pa2");
 		player.addChild(playerComp2);
 		var playerAlwaysComp = new Component(core);
-		playerAlwaysComp.setName("$pc");
+		playerAlwaysComp.setName("pc");
 		player.addChild(playerAlwaysComp);
 		
 		game.addChild(player);
