@@ -28,7 +28,6 @@ class BundleBuildMacro
 		}
 		
 		var name:String = localClassName;
-		name = ComponentName.PREFIX + name;
 		if (nameField == null)
 		{
 			nameField = {
