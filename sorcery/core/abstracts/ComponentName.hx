@@ -9,7 +9,7 @@ abstract ComponentName(String) from String to String
 	//inline public static var PREFIX = "$";
 	inline public static var EREG = "[A-Z][A-Z0-9]*";
 	
-	public function new(value:String)
+	inline public function new(value:String)
 	{
 		this = value;
 	}

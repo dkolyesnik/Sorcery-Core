@@ -74,14 +74,22 @@ class Bundle extends Behavior implements IBundle
 		onUninitialize();
 		super.onRemovedFromParent();
 	}
+	
+	public function preInitialize():Void
+	{
+		checkRequirements();
+		if (_waitingForInitialization.length > 0)
+			_onInitHandler = addHandler(new TypedHandlerData<BundleEvent>(BundleEvent.BUNDLE, createLink(""), _onRequiredBundleInitialized));
+	}
 
 	public function initialize():Void
 	{
-		checkRequirements();
 		onInitialize();
-		if (_waitingForInitialization.length > 0)
-			_onInitHandler = addHandler(new TypedHandlerData<BundleEvent>(BundleEvent.BUNDLE, createLink(""), _onRequiredBundleInitialized));
-		else
+	}
+	
+	public function completeInitialization():Void
+	{
+		if (_waitingForInitialization.length == 0)
 			_initializationComplete();
 	}
 

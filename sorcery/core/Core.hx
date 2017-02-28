@@ -56,9 +56,17 @@ class Core implements ICore implements HaxeContracts
 		for (bundle in pack)
 			_bundlesEntity.addChild(bundle);
 
-		//checking requirements and initializing budles
+		//checking requirements and adding handlers for delayed initialiation
+		for (bundle in pack)
+			bundle.preInitialize();
+			
+		// initialization
 		for (bundle in pack)
 			bundle.initialize();
+		
+		//sending events of complete initialization
+		for (bundle in pack)
+			bundle.completeInitialization();
 	}
 	
 	public function removeBundles(pack:Array<Bundle>):Void
