@@ -1,10 +1,11 @@
 package sorcery.core.abstracts;
+import sorcery.core.interfaces.IEvent;
 
 /**
  * ...
  * @author Dmitriy Kolyesnik
  */
-abstract EventType<T>(String) to String
+abstract EventType<T:IEvent>(String) to String
 {
 	inline public function new(s:String)
 	{

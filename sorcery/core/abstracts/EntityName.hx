@@ -8,7 +8,7 @@ abstract EntityName(String) from String to String
 {
 	inline public static var EREG = "[A-Z0-9]+";
 	
-	public function new(value:String)
+	inline public function new(value:String)
 	{
 		this = value;
 	}

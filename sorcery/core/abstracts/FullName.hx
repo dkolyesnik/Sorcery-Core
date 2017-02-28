@@ -8,8 +8,8 @@ import sorcery.core.CoreNames;
 abstract FullName(String) from String to String
 {
 	//var str = "^#(\\.[A-Z0-9]+)*(\\.\\$[A-Z][A-Z0-9]*)?$";
-	inline public static var EREG = CoreNames.ROOT+"(\\."+EntityName.EREG + ")*(\\."+ComponentName.EREG+")?";
-	public function new(value:String)
+	inline public static var EREG = CoreNames.ROOT+"(\\."+EntityName.EREG + ")*(\\:"+ComponentName.EREG+")?";
+	inline public function new(value:String)
 	{
 		this = value;
 	}

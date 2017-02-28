@@ -26,6 +26,7 @@ class SystemNodeBuildMacro
 	static var unprepareFuncName = "unprepare";
 	static macro public function build():Array<Field>
 	{
+		var localClassName = Context.getLocalClass().get().name;
 		var fieldsArray = Context.getBuildFields();
 		var selectedData = new Array<PrepData>();
 		
@@ -41,7 +42,7 @@ class SystemNodeBuildMacro
 			{
 				for (meta in field.meta)
 				{
-					if (meta.name == ":sorcery_prepare" && meta.params != null && meta.params.length > 0)
+					if (meta.name == medataName && meta.params != null && meta.params.length > 0)
 					{
 						linkPath = meta.params[0].getValue();
 						log('field with meta is found, link path = $linkPath');
@@ -114,30 +115,48 @@ class SystemNodeBuildMacro
 		}
 		
 		var prepareExprArray:Array<Expr>;
-		if (prepareField == null)
+		var privatePrepareField:Field;
+		if (prepareField != null)
 		{
-			log('$prepareFuncName is not found, creating');
-			if(parentIsSystemNode)
-				prepareExprArray = [macro var temp = true];
-			else
-				prepareExprArray = [macro var temp = super.$prepareFuncName()];
-			prepareField = {
-				name:prepareFuncName,
-				access:[APublic, AOverride],
-				kind:FieldType.FFun({
-					args:[],
-					expr: {expr: ExprDef.EBlock(prepareExprArray), pos:Context.currentPos()},
-					ret: macro:Bool
-				}),
+			privatePrepareField = prepareField;
+			log('$prepareFuncName is found, convering it to private method');
+			privatePrepareField.name = "_prepare" + localClassName;
+			
+			if (privatePrepareField.meta == null)
+				privatePrepareField.meta = [];
+				
+			privatePrepareField.meta.push({
+				name:":noCompletion",
 				pos:Context.currentPos()
-			}
-			fieldsArray.push(prepareField);
+			});
+			
+			privatePrepareField.access.remove(Access.AOverride);
+			privatePrepareField.access.remove(Access.APublic);
+			privatePrepareField.access.push(Access.APrivate);
+			
+			prepareField = null;
 		}
+		log('creating $prepareFuncName');
+		if(parentIsSystemNode)
+			prepareExprArray = [macro var temp = true];
 		else
+			prepareExprArray = [macro var temp = super.$prepareFuncName()];
+		if (privatePrepareField != null)
 		{
-			log('$prepareFuncName is found');
-			prepareExprArray = getExprArray(prepareField);
+			var privatePrepareFieldName = privatePrepareField.name;
+			prepareExprArray.push(macro { temp = temp && $i{privatePrepareFieldName}(); });
 		}
+		prepareField = {
+			name:prepareFuncName,
+			access:[APublic, AOverride],
+			kind:FieldType.FFun({
+				args:[],
+				expr: {expr: ExprDef.EBlock(prepareExprArray), pos:Context.currentPos()},
+				ret: macro:Bool
+			}),
+			pos:Context.currentPos()
+		}
+		fieldsArray.push(prepareField);
 		
 		var unprepareExprArray:Array<Expr>;
 		if (unprepareField == null)
@@ -183,15 +202,15 @@ class SystemNodeBuildMacro
 			if (path.charAt(0) == "-")
 			{
 				var pathVar = path.substr(1);
-				createLinksExpr.push(macro { this.$linkName = createLink(this.$pathVar); });
+				createLinksExpr.push(macro { $i{linkName} = createLink($i{pathVar}); });
 			}
 			else
-				createLinksExpr.push(macro { this.$linkName = createLink($v{path}); });
+				createLinksExpr.push(macro { $i{linkName} = createLink($v{path}); });
 				
-			prepareExprArray.push(macro this.$varName = cast this.$linkName.findChild());
-			prepareExprArray.push(macro temp = this.$varName != null && temp);
+			prepareExprArray.push(macro $i{varName} = cast $i{linkName}.findChild());
+			prepareExprArray.push(macro temp = $i{varName} != null && temp);
 			
-			unprepareExprArray.push(macro this.$varName = null);
+			unprepareExprArray.push(macro $i{varName} = null);
 		}
 		prepareExprArray.push(macro return temp);
 		

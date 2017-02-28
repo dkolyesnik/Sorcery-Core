@@ -9,6 +9,7 @@ import sorcery.core.interfaces.ICorePluginManager;
 import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.IEntityGroup;
 import sorcery.core.interfaces.IEntityRoot;
+import sorcery.core.interfaces.IFramework;
 import sorcery.core.interfaces.INotificator;
 import sorcery.core.interfaces.ITime;
 import haxecontracts.Contract;
@@ -19,55 +20,69 @@ import haxecontracts.HaxeContracts;
 class Core implements ICore implements HaxeContracts
 {
     public var root(get, null) : IEntityRoot;
+	public var framework(get, null):IFramework;
     public var time(get, null) : ITime;
 	
     var notificator(get, null) : INotificator;
 	var factory(get, null) : ICoreFactory;
 
-	private var _setup:CoreSetup;
-    
-    public function new(setup:CoreSetup)
+	var _bundlesEntity:IEntity;
+	
+    public function new(?p_factory:ICoreFactory)
     {
-		Contract.requires(setup != null);
-		
-		_setup = setup;
+		if (p_factory == null)
+			factory = new CoreFactory();
+		else
+			factory = p_factory;
 		
 		_initialize();
     }
     
     function _initialize() : ICore
     {
-		if (_setup.factory == null)
-			factory = new CoreFactory();
-		else
-			factory = _setup.factory;
-        
         factory.initialize(this);
 
         _createAll();
 		
-		var bundlesEntity = allocateEntity("bundles");
-		root.addChild(bundlesEntity);
-		for (bundle in _setup._bundles)
-		{
-			//adding as a child, so bundle will have core access
-			bundlesEntity.addChild(bundle);
-		}
-        
-		for (bundle in _setup._bundles)
-		{
-			//bundles asks parent if required bundles are added
-			bundle.initialize();
-		}
+		_bundlesEntity = allocateEntity("bundles");
+		root.addChild(_bundlesEntity);
 		
         return this;
     }
+	
+	public function addBundles(pack:Array<Bundle>):Void
+	{
+		//adding as a child, so bundle will have core access
+		for (bundle in pack)
+			_bundlesEntity.addChild(bundle);
+
+		//checking requirements and adding handlers for delayed initialiation
+		for (bundle in pack)
+			bundle.preInitialize();
+			
+		// initialization
+		for (bundle in pack)
+			bundle.initialize();
+		
+		//sending events of complete initialization
+		for (bundle in pack)
+			bundle.completeInitialization();
+	}
+	
+	public function removeBundles(pack:Array<Bundle>):Void
+	{
+		
+		for (bundle in pack)
+			_bundlesEntity.removeChild(bundle);
+		_bundlesEntity.sendEvent(BundleEvent.getCheckRequirmentsEvent());
+	}
     
     private function _createAll() : Void
     {
         notificator = factory.createNotificator();
         time = factory.createTime();
         root = factory.createRoot();
+		framework = factory.createFramework();
     }
     
     public function allocateEntity(?name:String) : IEntity
@@ -103,6 +118,11 @@ class Core implements ICore implements HaxeContracts
 	public function get_factory():ICoreFactory
 	{
 		return factory;
+	}
+	
+	function get_framework():IFramework 
+	{
+		return framework;
 	}
 }
 

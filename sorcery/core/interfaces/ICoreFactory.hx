@@ -16,6 +16,8 @@ interface ICoreFactory
     
     function createRoot() : IEntityRoot;
     
+	function createFramework():IFramework;
+	
     function generateName() : String;
     
     function allocateEntity() : IEntity;

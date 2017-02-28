@@ -3,6 +3,7 @@
  */
 package sorcery.core;
 
+import sorcery.core.abstracts.Path;
 import sorcery.core.CoreNames;
 import sorcery.core.abstracts.EntityName;
 import sorcery.core.abstracts.FullName;
@@ -96,29 +97,61 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 		if (p_name == CoreNames.ROOT)
 			return this;
 
-		var groupsAr = p_name.split(".");
-		if (groupsAr.length > 0)
+		//TODO optimize
+		//var groupsAr = p_name.split(".");
+		var entityName = "";
+		var entity:IEntity;
+		var gr:IEntityGroup = this;
+		if (p_name.charAt(1) == Path.TO_COMPONENT)
+			return findChild(p_name.substr(2));
+			
+		for (i in 2...p_name.length)
 		{
-			var entity:IEntity =  this;
-			var gr:IEntityGroup;
-			for (i in 1...groupsAr.length)
+			var c = p_name.charAt(i);
+			if (c == Path.TO_GROUP)
 			{
-				var childName = groupsAr[i];
-				if (childName.charAt(0) == "$")
-				{
-					return entity.findChild(childName);
-				}
-				else
-				{
-					if (entity == null || !(entity is IEntityGroup))
-						return null;
+				entity = gr.findEntity(entityName);
+				if (entity == null)
+					return null;
+				if (entity.isGroup())
 					gr = cast entity;
-					entity = gr.findEntity(childName);
-				}
+				else
+					return entity;
+				entityName = "";
 			}
-			return entity;
+			else if (c == Path.TO_COMPONENT)
+			{
+				entity = gr.findEntity(entityName);
+				return entity.findChild(p_name.substr(i + 1));
+			}
+			else
+			{
+				entityName += c;
+			}
+			//if (groupsAr.length > 0)
+			//{
+				//var entity:IEntity =  this;
+				//var gr:IEntityGroup;
+				////for (i in 1...groupsAr.length)
+				////{
+					////var childName = groupsAr[i];
+					////if (childName.charAt(0) == "$")
+					////{
+						////return entity.findChild(childName);
+					////}
+					////else
+					////{
+						////if (entity == null || !(entity is IEntityGroup))
+							////return null;
+						////gr = cast entity;
+						////entity = gr.findEntity(childName);
+					////}
+				////}
+				//return entity;
+			//}
 		}
-		return null;
+		
+		return gr.findEntity(entityName);
 	}
 
 	public function clearCachedChild(p_name:String):Void

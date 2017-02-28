@@ -89,6 +89,11 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 	{
 		return false;
 	}
+	
+	public function isGroup():Bool
+	{
+		return true;
+	}
 
 	public function setName(p_name : String) : Void
 	{

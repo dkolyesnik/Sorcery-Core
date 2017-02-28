@@ -6,7 +6,7 @@ package sorcery.core.abstracts;
  */
 abstract Agenda(String) from String to String
 {
-	public function new(value:String)
+	inline public function new(value:String)
 	{
 		this = value;
 	}

@@ -5,6 +5,7 @@ package sorcery.core;
 
 import sorcery.core.interfaces.IEvent;
 
+//@:autoBuild(sorcery.core.macros.EventBuildMacro.build())
 class Event implements IEvent
 {
     public var type(get, never) : String;
@@ -15,8 +16,13 @@ class Event implements IEvent
     {
         _type = p_type;
     }
+	
+	public function reset():Void
+	{
+		
+	}
     
-    private function get_type() : String
+    function get_type() : String
     {
         return _type;
     }

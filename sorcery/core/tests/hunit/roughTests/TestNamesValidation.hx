@@ -22,7 +22,7 @@ class TestNamesValidation extends TestCase
 	{
 		var ereg = FullName.EREG;
 		
-		assert.isTrue(FullName.validate("#.game.player.gun.$comp"));
+		assert.isTrue(FullName.validate("#.game.player.gun:comp"));
 		assert.isTrue(FullName.validate("#.game.player"));
 		assert.isFalse(FullName.validate("#.game."));
 		return;
@@ -34,18 +34,18 @@ class TestNamesValidation extends TestCase
 	{
 		assert.isTrue(Path.validate("#"));
 		assert.isTrue(Path.validate("#.ad"));
-		assert.isTrue(Path.validate("#.$ad"));
-		assert.isTrue(Path.validate("#.game.player.gun.$comp"));
+		assert.isTrue(Path.validate("#:ad"));
+		assert.isTrue(Path.validate("#.game.player.gun:comp"));
 		assert.isTrue(Path.validate("#.game.player.gun"));
 		
 		assert.isFalse(Path.validate("#.game.player.gun."));
-		assert.isFalse(Path.validate("#.game.$player.$gun"));
+		assert.isFalse(Path.validate("#.game.$player:gun"));
 		
 		
 		assert.isTrue(Path.validate("adf"));
 		assert.isTrue(Path.validate("@@adf"));
-		assert.isTrue(Path.validate("$adf"));
-		assert.isTrue(Path.validate("@$adf"));
+		assert.isTrue(Path.validate(":adf"));
+		assert.isTrue(Path.validate("@:adf"));
 		assert.isTrue(Path.validate("@"));
 		assert.isTrue(Path.validate("@@"));
 		
@@ -55,10 +55,10 @@ class TestNamesValidation extends TestCase
 		
 		
 		assert.isTrue(Path.validate("...asd"));
-		assert.isTrue(Path.validate("...$asd"));
-		assert.isTrue(Path.validate("...asda.$asd"));
+		assert.isTrue(Path.validate("...:asd"));
+		assert.isTrue(Path.validate("...asda:asd"));
 		
-		assert.isFalse(Path.validate("...#.$asd"));
-		assert.isFalse(Path.validate(".$asd.ads"));
+		assert.isFalse(Path.validate("...#.:asd"));
+		assert.isFalse(Path.validate(".:asd.ads"));
 	}
 }

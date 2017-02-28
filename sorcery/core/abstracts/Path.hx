@@ -8,12 +8,13 @@ import sorcery.core.CoreNames;
  */
 abstract Path(String) from String to String
 {
-	inline static var TO_PARENT = "@";
-	inline static var TO_GROUP = ".";
+	inline public static var TO_PARENT = "@";
+	inline public static var TO_GROUP = ".";
+	inline public static var TO_COMPONENT = ":";
 	
 	inline static var SEARCH_ENTITY_IN_PARENT = "^[@]*(" + EntityName.EREG + ")?$";
-	inline static var SEARCH_COMP_IN_PARENT = "^[@]*" + ComponentName.EREG + "$";
-	inline static var SEARCH_IN_GROUP = "^[\\.]*(\\." + EntityName.EREG + ")*(\\." + ComponentName.EREG + ")?$";
+	inline static var SEARCH_COMP_IN_PARENT = "^[@]*\\:" + ComponentName.EREG + "$";
+	inline static var SEARCH_IN_GROUP = "^[\\.]*(\\." + EntityName.EREG + ")*(\\:" + ComponentName.EREG + ")?$";
 	
 	//static var ereg = ~/^[\w-\.]{2,}@[\w-\.]{2,}\.[a-z]{2,6}$/i;
 	inline public function new(s:String)
@@ -39,14 +40,15 @@ abstract Path(String) from String to String
 		/* @ is link to parent entity
 		 * we have several options
 		 * 1) full path it will look like
-		 * 		#game.fiels.player.$component
+		 * 		#.game.fiels.player.$component
+		 * 		#.game.fiels.player:component
 		 *    this whole string is the fullName of the entity
 		 * 	  = we simply return full string as full name
 		 * 2) reletive path it will look like
 		 * 		.player - search entity by name in current group
-		 *      .$comp - serach child in current group
+		 *      .:comp - serach child in current group
 		 *    	    = owner.group.fullName + this
-		 *      ..player.$comp  - go up and owner.group.fullName + (this without dots) 
+		 *      ..player:comp  - go up and owner.group.fullName + (this without dots) 
 		 *     this meens that we should go down the root by two groups (each dot marks group) from current owner's paretn
 		 * 	   so this would be parent group of the parent group of the component's parent
 		 *     = we iterate throu string and going up by the group for each dot
@@ -59,7 +61,7 @@ abstract Path(String) from String to String
 		 *     @@ - parent's parent 
 		 *        and so on
 		 *        can specify child name, but not the path
-		 *     @@$some or @@@some - right
+		 *     @@:some or @@@some - right
 		 *     @some.child  - WRONG
 		 * 	   . - group
 		 * 4) "" - current entity
@@ -72,7 +74,7 @@ abstract Path(String) from String to String
 
 		switch (this.charAt(0))
 		{
-			case ComponentName.PREFIX: return entity.fullName + "." + this;
+			case ":": return entity.fullName + this;
 			case CoreNames.ROOT: return this;
 			case TO_GROUP: return resolveGroupPath(this, entity);
 			case TO_PARENT: return resolveParentsPath(this, entity);
@@ -85,20 +87,20 @@ abstract Path(String) from String to String
 		var parent = entity.parent;
 		for (i in 1...s.length)
 		{
-			if (s.charAt(i) == TO_PARENT)
+			var c = s.charAt(i);
+			if (c == TO_PARENT)
 			{
 				if (parent.name == CoreNames.ROOT)
 					return null;
 				parent = parent.parent;
 			}
+			else if(c == TO_COMPONENT)
+			{
+				return parent.fullName + s.substr(i);
+			}
 			else
 			{
-				if (s.charAt(i) == ComponentName.PREFIX)
-					return parent.fullName + "." + s.substr(i);
-				else
-					return parent.group.fullName + "." + s.substr(i);
-					
-				return null;
+				return parent.group.fullName + s.substr(i);
 			}
 		}
 		return parent.fullName;
@@ -109,15 +111,20 @@ abstract Path(String) from String to String
 		var group = entity.group;
 		for (i in 1...s.length)
 		{
-			if (s.charAt(i) == TO_GROUP)
+			var c = s.charAt(i);
+			if (c == TO_GROUP)
 			{
 				if (group.name == CoreNames.ROOT)
 					return null;
 				group = group.parentGroup;
 			}
+			//else if (c == TO_COMPONENT)
+			//{
+				//return group.fullName + s.substr(i);
+			//}
 			else
 			{
-				return group.fullName + "." + s.substr(i);
+				return group.fullName + s.substr(i);
 			}
 		}
 		return null;
