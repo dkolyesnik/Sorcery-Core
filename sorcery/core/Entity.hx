@@ -382,7 +382,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		updateChildrenAgendaState();
 	}
 
-	public function hide(p_agenda : String = null) : Void
+	public function hide(?p_agenda : String) : Void
 	{
 		Contract.requires(p_agenda == null || Agenda.validate(p_agenda));
 		Contract.ensures(p_agenda != BaseAgenda.ALWAYS && getCurrentAgenda() != p_agenda);

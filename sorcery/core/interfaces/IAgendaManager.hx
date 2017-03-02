@@ -25,7 +25,7 @@ interface IAgendaManager
 	 * deactivates agenda
 	 * @param agenda name, if null deactivates currentAgenda
 	 */
-	function hide(p_agenda : String = null) : Void;
+	function hide(?p_agenda : String) : Void;
 	
 	/**
 	 * hides all agendas, ALWAYS is still active
