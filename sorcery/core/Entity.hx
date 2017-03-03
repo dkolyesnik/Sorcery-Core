@@ -115,8 +115,11 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		
 		if (!isAddedToRoot())
 			return null;
-
-		return group.fullName + "." + name;
+		if (name != CoreNames.ROOT)
+			return group.fullName + "." + name;
+		else
+			return CoreNames.ROOT;
+		
 	}
 
 	// ==============================================================================

@@ -34,7 +34,7 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 		
 		//_wrappedEntity = ;
 		//_wrappedEntity.setName(CoreNames.ROOT);
-		super(_wrappedEntity = new EntityForRoot(p_core));
+		super(new EntityForRoot(p_core));
 	}
 	
 	public function getNodes(nodeName:String):NodeList
@@ -167,10 +167,10 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 		return this;
 	}
 	
-	override function get_fullName():String 
-	{
-		return CoreNames.ROOT;
-	}
+	//override function get_fullName():String 
+	//{
+		//return CoreNames.ROOT;
+	//}
 }
 
 private class EntityForRoot extends Entity
@@ -202,9 +202,9 @@ private class EntityForRoot extends Entity
 
 	}
 
-	override function get_fullName():String
-	{
-		return name;
-	}
+	//override function get_fullName():String
+	//{
+		//return name;
+	//}
 
 }
