@@ -4,12 +4,12 @@
 package sorcery.core.interfaces;
 
 
-interface IEntityGroup
-{
+interface IEntityGroup extends IFullName
+{ 
 	@:property
 	var name(get, null) : String;
-	@:property
-	var fullName(get, never) : String;
+	//@:property
+	//var fullName(get, never) : String;
 	@:property
 	var parentGroup(get, null) : IEntityGroup;
 	

@@ -6,10 +6,8 @@ import sorcery.core.interfaces.IAgendaChild;
 import sorcery.core.interfaces.IAgendaManager;
 
 @:allow(sorcery.core.interfaces.IEntityGroup)
-interface IEntity extends IAgendaChild extends IEventSender extends IParent
+interface IEntity extends IAgendaChild extends IEventSender extends IParent extends IFullName
 {
-	@:property
-	var fullName(get, never) : String;
 	@:property
 	var group(get, null) : IEntityGroup;
 	@:property

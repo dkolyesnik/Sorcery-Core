@@ -27,8 +27,11 @@ class EntityChild implements IEntityChild //implements HaxeContracts
 	}
 
 	/* INTERFACE bgcore.interfaces.IEntityChild */
+	@:property
 	public var core(get, null):ICore;
+	@:property
 	public var parent(get, null):IEntity;
+	@:property
 	public var name(get, null):String;
 
 	// ==============================================================================
