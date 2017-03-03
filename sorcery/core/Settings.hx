@@ -8,7 +8,9 @@ import sorcery.core.interfaces.ISettings;
 
 class Settings implements ISettings
 {
+	@:property
     public var appName(get, never) : String;
+	@:property
     public var version(get, never) : String;
 
     private var _appName : String;

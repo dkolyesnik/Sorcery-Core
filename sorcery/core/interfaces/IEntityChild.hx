@@ -8,8 +8,11 @@ import sorcery.core.interfaces.ICore;
 @:allow(sorcery.core.interfaces.IEntityChildLink)
 interface IEntityChild
 {
+	@:property
 	var core(get, null):ICore;
+	@:property
 	var parent(get, null) : IEntity;
+	@:property
 	var name(get, null) : String;
 	
 	function isEntity():Bool;

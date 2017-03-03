@@ -17,6 +17,7 @@ import haxecontracts.HaxeContracts;
  */
 class EntityChildLink implements IEntityChildLink implements ILinkInternal implements HaxeContracts
 {
+	@:property
 	public var fullName(get, null):String;
 	var _path:Path;
 	var _owner:IComponent;

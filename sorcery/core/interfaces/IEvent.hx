@@ -6,6 +6,7 @@ package sorcery.core.interfaces;
 
 interface IEvent
 {
+	@:property
     var type(get, never) : String;
 	
 	function reset():Void;

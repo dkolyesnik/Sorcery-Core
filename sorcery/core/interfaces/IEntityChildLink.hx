@@ -5,6 +5,7 @@ package sorcery.core.interfaces;
  */
 interface IEntityChildLink 
 {
+	@:property
 	var fullName(get, null):String;
 	function findChild():IEntityChild;
 }

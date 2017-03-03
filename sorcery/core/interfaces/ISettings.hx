@@ -7,7 +7,9 @@ import sorcery.core.interfaces.ICore;
 
 interface ISettings
 {
+	@:property
     var appName(get, never) : String;    
+	@:property
     var version(get, never) : String;
 
     function initialize(p_core : ICore) : Void;

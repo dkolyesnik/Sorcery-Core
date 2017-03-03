@@ -16,8 +16,9 @@ import haxecontracts.HaxeContracts;
 
 class Behavior extends Component implements IBehavior implements HaxeContracts
 {
-	@:isVar
-    public var enabled(get, set) : Bool = true;
+	@:property
+    public var enabled(get, set) : Bool;
+	var _enabled:Bool = true;
 	
     var _handlers : Array<HandlerData>;
 	var _links:Array<ILinkInternal> = [];
@@ -118,20 +119,20 @@ class Behavior extends Component implements IBehavior implements HaxeContracts
     
     function set_enabled(value : Bool) : Bool
     {
-        if (enabled == value)
+        if (_enabled == value)
         {
             return value;
         }
         
-        enabled = value;
-        (enabled) ? onEnable() : onDisable();
+        _enabled = value;
+        (_enabled) ? onEnable() : onDisable();
         
         updateActiveState();
         return value;
     }
 	
 	function get_enabled():Bool{
-		return enabled;
+		return _enabled;
 	}
    
     // ==============================================================================

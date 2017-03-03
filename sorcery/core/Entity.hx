@@ -39,12 +39,16 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	 * it looks like #.group1.group2.name
 	 * if entity is not added to root it's full name is null (? maybe it would be better to use something else ?)
 	 */
+	@:property
 	public var fullName(get, never) : String;
+	@:property
 	public var group(get, null) : IEntityGroup;
+	@:property
 	public var agenda(get, never) : IAgendaManager;
-	@:isVar
-	public var enabled(get, set) : Bool = true;
-
+	@:property
+	public var enabled(get, set) : Bool;
+	var _enabled = true;
+	
 	var _pool : IPool;
 
 	var _isDestroyed = false;
@@ -84,17 +88,17 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 
 	function get_enabled():Bool
 	{
-		return enabled;
+		return _enabled;
 	}
 
 	function set_enabled(value : Bool) : Bool
 	{
-		if (enabled == value)
+		if (_enabled == value)
 		{
 			return value;
 		}
 
-		enabled = value;
+		_enabled = value;
 
 		updateActiveState();
 		return value;

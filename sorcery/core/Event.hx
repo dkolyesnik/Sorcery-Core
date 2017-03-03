@@ -8,6 +8,7 @@ import sorcery.core.interfaces.IEvent;
 //@:autoBuild(sorcery.core.macros.EventBuildMacro.build())
 class Event implements IEvent
 {
+	@:property
     public var type(get, never) : String;
 
     private var _type : String;

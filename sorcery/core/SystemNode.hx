@@ -22,8 +22,11 @@ class SystemNode extends Behavior implements ISystemNode
 {
 	public var nodeName(get, null):String;
 	
+	@:property
 	var list(get, null):NodeList;
+	@:property
 	var next(get, null):ISystemNode;
+	@:property
 	var prev(get, null):ISystemNode;
 	
 	public function new(p_core:ICore) 

@@ -13,9 +13,11 @@ import haxecontracts.HaxeContracts;
 
 class HandlerData
 {
-
+	@:property
 	public var target(get, never) : String;
+	@:property
 	public var priority(get, null) : Priority;
+	@:property
 	public var type(get, null) : String;
 
 	var next:HandlerData;

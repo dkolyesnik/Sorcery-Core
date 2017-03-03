@@ -5,7 +5,6 @@ package sorcery.core;
 import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.ICoreFactory;
 import sorcery.core.interfaces.IBundle;
-import sorcery.core.interfaces.ICorePluginManager;
 import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.IEntityGroup;
 import sorcery.core.interfaces.IEntityRoot;
@@ -19,11 +18,16 @@ import haxecontracts.HaxeContracts;
 
 class Core implements ICore implements HaxeContracts
 {
+	@:property
     public var root(get, null) : IEntityRoot;
+	@:property
 	public var framework(get, null):IFramework;
+	@:property
     public var time(get, null) : ITime;
 	
+	@:property
     var notificator(get, null) : INotificator;
+	@:property
 	var factory(get, null) : ICoreFactory;
 
 	var _bundlesEntity:IEntity;
@@ -126,3 +130,48 @@ class Core implements ICore implements HaxeContracts
 	}
 }
 
+interface I
+{
+	@:property
+    var some(get,set):Bool;
+}
+
+interface J
+{
+	@:property
+	var some(get, set):Bool;
+	function doSome():Void;
+}
+
+class A implements I implements J
+{
+    @:property
+	public var some(get,set):Bool;
+    var _some:Bool;
+    function get_some():Bool
+    {
+        return _some;
+    }
+    function set_some(v:Bool):Bool
+    {
+        return _some = v;
+    }
+	
+	public function doSome():Void
+	{
+		
+	}
+	
+	public function new()
+	{
+		
+	}
+}
+
+class B extends A 
+{
+    override function get_some():Bool
+    {
+        return true;
+    }
+}

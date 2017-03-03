@@ -15,7 +15,6 @@ class BundleEvent extends Event
 	inline static public var BUNDLE = new EventType<BundleEvent>("bundle");
 	inline static public var CHECK_REQUIREMENTS = new EventType<Event>("checkRequirements");
 	
-
 	public var subType(default, null):String;
 
 	public function new(p_subType:String)

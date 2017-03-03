@@ -32,9 +32,9 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 		Contract.requires(p_core != null);
 		Contract.ensures(name == CoreNames.ROOT);
 		
-		_wrappedEntity = new EntityForRoot(p_core);
-		_wrappedEntity.setName(CoreNames.ROOT);
-		super(_wrappedEntity);
+		//_wrappedEntity = ;
+		//_wrappedEntity.setName(CoreNames.ROOT);
+		super(_wrappedEntity = new EntityForRoot(p_core));
 	}
 	
 	public function getNodes(nodeName:String):NodeList

@@ -8,7 +8,7 @@ import sorcery.core.HandlerData;
 
 interface IBehavior extends IComponent
 {
-
+	@:property
 	var enabled(get, set) : Bool;
 	
 	function addHandler(handler:HandlerData):HandlerData;

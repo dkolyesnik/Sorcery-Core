@@ -6,8 +6,11 @@ package sorcery.core.interfaces;
 
 interface IEntityGroup
 {
+	@:property
 	var name(get, null) : String;
+	@:property
 	var fullName(get, never) : String;
+	@:property
 	var parentGroup(get, null) : IEntityGroup;
 	
     function findEntity(p_name : String) : IEntity;

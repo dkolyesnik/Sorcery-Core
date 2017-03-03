@@ -13,7 +13,7 @@ import sorcery.core.interfaces.IEntityChild;
  * ...
  * @author Dmitriy Kolyesnik
  */
-class EntityChild implements IEntityChild implements HaxeContracts
+class EntityChild implements IEntityChild //implements HaxeContracts
 {
 	var _isActive = false;
 	var _isActivatedByParent = false;
@@ -79,8 +79,8 @@ class EntityChild implements IEntityChild implements HaxeContracts
 
 	public function setName(p_name:String):Void
 	{
-		Contract.requires(p_name != CoreNames.ROOT && p_name != "");
-		Contract.requires( parent == null || name == p_name);
+		//Contract.requires(p_name != CoreNames.ROOT && p_name != "");
+		//Contract.requires( parent == null || name == p_name);
 		
 		if (parent == null)
 		{
@@ -95,7 +95,7 @@ class EntityChild implements IEntityChild implements HaxeContracts
 
 	public function hasAgenda(p_agenda:String):Bool
 	{
-		Contract.requires(Agenda.validate(p_agenda));
+		//Contract.requires(Agenda.validate(p_agenda));
 		
 		if (_agendas == null)
 			return p_agenda == BaseAgenda.ALWAYS;
@@ -105,8 +105,8 @@ class EntityChild implements IEntityChild implements HaxeContracts
 
 	public function addAgenda(p_agenda:String):Void
 	{
-		Contract.requires(Agenda.validate(p_agenda));
-		Contract.ensures(_agendas.exists(p_agenda));
+		//Contract.requires(Agenda.validate(p_agenda));
+		//Contract.ensures(_agendas.exists(p_agenda));
 		
 		if (_agendas == null)
 			_agendas = new Map();
@@ -121,8 +121,8 @@ class EntityChild implements IEntityChild implements HaxeContracts
 
 	public function removeAgenda(p_agenda:String):Void
 	{
-		Contract.requires(Agenda.validate(p_agenda));
-		Contract.ensures(_agendas == null || !_agendas.exists(p_agenda));
+		//Contract.requires(Agenda.validate(p_agenda));
+		//Contract.ensures(_agendas == null || !_agendas.exists(p_agenda));
 		
 		if (_agendas != null && _agendas.remove(p_agenda))
 		{
@@ -155,7 +155,7 @@ class EntityChild implements IEntityChild implements HaxeContracts
 
 	function onRemovedFromParent():Void
 	{
-		Contract.ensures(parent == null);
+		//Contract.ensures(parent == null);
 		
 		parent = null;
 	}
@@ -172,7 +172,7 @@ class EntityChild implements IEntityChild implements HaxeContracts
 
 	function setFocus(focus:Bool):Void
 	{
-		Contract.ensures(focus == _isFocused);
+		//Contract.ensures(focus == _isFocused);
 		
 		if (_isFocused == focus)
 			return;

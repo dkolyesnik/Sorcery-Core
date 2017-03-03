@@ -29,13 +29,21 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 	var _entitiesByName = new Map<String, IEntity>();
 	var _wrappedEntity:IEntity;
 
+	@:property
 	public var name(get, null) : String;
+	@:property
 	public var fullName(get, never) : String;
+	@:property
 	public var parentGroup(get, null) : IEntityGroup;
+	@:property
 	public var group(get, null) : IEntityGroup;
+	@:property
 	public var enabled(get, set) : Bool;
+	@:property
 	public var agenda(get, never) : IAgendaManager;
+	@:property
 	public var core(get, null):ICore;
+	@:property
 	public var parent(get, null) : IEntity;
 
 	public function new(entity:IEntity)

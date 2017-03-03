@@ -8,9 +8,13 @@ import sorcery.core.interfaces.IAgendaManager;
 @:allow(sorcery.core.interfaces.IEntityGroup)
 interface IEntity extends IAgendaChild extends IEventSender extends IParent
 {
+	@:property
 	var fullName(get, never) : String;
+	@:property
 	var group(get, null) : IEntityGroup;
+	@:property
 	var enabled(get, set) : Bool;
+	@:property
 	var agenda(get, never) : IAgendaManager;
 
 	function isWrapped():Bool;

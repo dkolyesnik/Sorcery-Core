@@ -11,11 +11,16 @@ class Time implements ITime
 {
 	public var MAX_DELTA_TIME : Float = 0.05;
 
+	@:property
 	public var fps(get, null) : Int = 0;
+	@:property
 	public var dt(get, null) : Float = 0.0;
+	@:property
 	public var isStarted(get, null) : Bool = true;
-	@:isVar
-	public var timeScale(get, set) : Float = 1.0;
+	@:property
+	public var timeScale(get, set) : Float;
+	var _timeScale = 1.0;
+	@:property
 	public var lifeTime(get, null) : Float = 0.0;
 
 	var _core : ICore;
@@ -68,7 +73,7 @@ class Time implements ITime
 
 		_prevFrameTime = curTime;
 
-		dt *= timeScale;
+		dt *= _timeScale;
 
 		var ent:IEntity = cast _core.root;
 		ent.sendEvent(CoreEvent.coreUpdateEvent);
@@ -86,9 +91,9 @@ class Time implements ITime
 	{
 		if ((value != 0 && !Math.isNaN(value)) && value >= 0.1 && value <= 5)
 		{
-			timeScale = value;
+			_timeScale = value;
 		}
-		return timeScale;
+		return _timeScale;
 	}
 	
 	function get_fps():Int 
@@ -108,7 +113,7 @@ class Time implements ITime
 	
 	function get_timeScale():Float 
 	{
-		return timeScale;
+		return _timeScale;
 	}
 	
 	function get_lifeTime():Float 

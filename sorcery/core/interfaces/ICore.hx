@@ -9,8 +9,11 @@ import sorcery.core.interfaces.IAgendaManager;
 @:allow(sorcery.core.interfaces.ITime)
 interface ICore
 {
+	@:property
     var root(get, null) : IEntityRoot;    
+	@:property
     var framework(get, null):IFramework;
+	@:property
     var time(get, null) : ITime;    
 	
 	function addBundles(pack:Array<Bundle>):Void;
@@ -21,6 +24,7 @@ interface ICore
 	@:allow(sorcery.core.interfaces.IBehavior)
     private var notificator(get, null) : INotificator;    
     
+	@:property
 	@:allow(sorcery.core.interfaces.IEntity)
     private var factory(get, null) : ICoreFactory;    
 
