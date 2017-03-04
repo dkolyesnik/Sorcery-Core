@@ -1,0 +1,5 @@
+{
+	name:"$(EntryPoint)",
+	params:[],
+	pos:Context.currentPos()
+}
