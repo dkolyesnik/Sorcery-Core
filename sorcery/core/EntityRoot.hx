@@ -183,8 +183,9 @@ private class EntityForRoot extends Entity
 		name = CoreNames.ROOT;
 	}
 
-	override public function setName(p_name:String):Void
+	override public function setName(p_name:String):IEntityChild
 	{
+		return this;
 	}
 
 	override function set_enabled(value:Bool):Bool

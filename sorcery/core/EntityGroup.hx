@@ -95,11 +95,11 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 		return true;
 	}
 
-	public function setName(p_name : String) : Void
+	public function setName(p_name : String) : IEntityChild
 	{
 		Contract.requires(EntityName.validate(p_name));
 		
-		_wrappedEntity.setName(p_name);
+		return _wrappedEntity.setName(p_name);
 	}
 
 	public function isActive() : Bool

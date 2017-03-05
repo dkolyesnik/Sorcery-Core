@@ -18,7 +18,7 @@ interface IEntityChild
 	function isActivatedByParent():Bool;
 	function isAddedToRoot() : Bool;
 
-	function setName(p_name : String) : Void;
+	function setName(p_name : String) : IEntityChild;
 
 	function destroy() : Void;
 

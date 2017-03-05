@@ -24,11 +24,11 @@ class Component extends sorcery.core.EntityChild implements IComponent implement
 		super(p_core);
 	}
 	
-	override public function setName(p_name:String):Void 
+	override public function setName(p_name:String):IEntityChild 
 	{
 		Contract.requires(ComponentName.validate(p_name));
 		
-		super.setName(p_name);
+		return super.setName(p_name);
 	}
 
 	function onActivate() : Void

@@ -67,11 +67,11 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		_activeAgendas = [BaseAgenda.ALWAYS];
 	}
 
-	override public function setName(p_name:String):Void 
+	override public function setName(p_name:String):IEntityChild 
 	{
 		Contract.requires(EntityName.validate(p_name));
 		
-		super.setName(p_name);
+		return super.setName(p_name);
 	}
 	
 	// ==============================================================================

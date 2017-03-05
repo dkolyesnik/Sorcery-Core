@@ -77,7 +77,7 @@ class EntityChild implements IEntityChild implements HaxeContracts
 		return _isAddedToRoot;
 	}
 
-	public function setName(p_name:String):Void
+	public function setName(p_name:String):IEntityChild
 	{
 		Contract.requires(p_name != CoreNames.ROOT && p_name != "");
 		Contract.requires( parent == null || name == p_name);
@@ -86,6 +86,8 @@ class EntityChild implements IEntityChild implements HaxeContracts
 		{
 			name = p_name;
 		}
+		
+		return this;
 	}
 
 	public function destroy():Void
