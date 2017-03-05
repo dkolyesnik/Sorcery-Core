@@ -9,6 +9,22 @@ import sorcery.core.CoreNames;
  */
 class EntityTools
 {
+	/**
+	 * find first child with name childName searching in parents up to root
+	 */
+	public static function findChildInParents(entity:IEntity, childName):IEntityChild
+	{
+		var par = entity.parent;
+		if (par != null)
+		{
+			var child = par.findChild(childName);
+			if (child != null)
+				return child;
+			par = par.parent;
+		}
+		return null;
+	}
+	
 	public static function checkWhetherChildCanBeAdded(entity:IEntity, child:IEntityChild):Bool
 	{
 		if (child.name == CoreNames.ROOT)
