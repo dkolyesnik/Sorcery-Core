@@ -1,7 +1,9 @@
 package sorcery.core.tools;
+import sorcery.core.Event;
 import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.IEntityChild;
 import sorcery.core.CoreNames;
+import sorcery.core.interfaces.IEntityRoot;
 
 /**
  * ...
@@ -23,6 +25,16 @@ class EntityTools
 			par = par.parent;
 		}
 		return null;
+	}
+	
+	public static function sendEventTo(entityRoot:IEntityRoot, event:Event, targetFullName:String):Void
+	{
+		var child = entityRoot.findChildByFullName(targetFullName);
+		if (child != null && child.isEntity())
+		{
+			var target:IEntity = cast child;
+			target.sendEvent(event);
+		}
 	}
 	
 	public static function checkWhetherChildCanBeAdded(entity:IEntity, child:IEntityChild):Bool
