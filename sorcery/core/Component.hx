@@ -33,10 +33,32 @@ class Component extends sorcery.core.EntityChild implements IComponent implement
 
 	function onActivate() : Void
 	{
+		//override
 	}
-
-	function onDeactivate() : Void
+	
+    function onDeactivate() : Void
 	{
+		//override
+	}
+	
+	function onAddedToRoot() : Void
+	{
+		//override
+	}
+	
+	function onRemovedFromRoot() : Void
+	{
+		//override
+	}
+	
+	function onFocus() : Void
+	{
+		//override
+	}
+	
+	function onLostFocus() : Void
+	{
+		//override
 	}
 
 	// ==============================================================================
@@ -47,54 +69,75 @@ class Component extends sorcery.core.EntityChild implements IComponent implement
 	}
 
 	
-	override function updateActiveState() : Void
+	//override function updateActiveState() : Void
+	//{
+		//var isMustBeActive : Bool = isAddedToRoot() && _isActivatedByParent && parent.isActive();
+//
+		//if (isMustBeActive == _isActive)
+		//{
+			//return;
+		//}
+//
+		//_isActive = isMustBeActive;
+//
+		//if (_isActive)
+		//{
+			//onActivate();
+		//}
+		//else
+		//{
+			//onDeactivate();
+		//}
+	//}
+	
+	//override function onActivatedByParent():Void
+	//{
+		//_isActivatedByParent = true;
+		//if (parent.isAddedToRoot())
+			//onAddedToRoot();
+	//}
+	//
+	//override function onDeactivatedByParent():Void
+	//{
+		//_isActivatedByParent = false;
+		//if (isAddedToRoot())
+			//onRemovedFromRoot();
+	//}
+	//
+	
+	override function activate():Void 
 	{
-		var isMustBeActive : Bool = isAddedToRoot() && _isActivatedByParent && parent.isActive();
-
-		if (isMustBeActive == _isActive)
-		{
-			return;
-		}
-
-		_isActive = isMustBeActive;
-
-		if (_isActive)
-		{
-			onActivate();
-		}
-		else
-		{
-			onDeactivate();
-		}
+		onActivate();
 	}
 	
-	override function onActivatedByParent():Void
+	override function deactivate():Void 
 	{
-		_isActivatedByParent = true;
-		if (parent.isAddedToRoot())
-			onAddedToRoot();
+		onDeactivate();
 	}
 	
-	override function onDeactivatedByParent():Void
-	{
-		_isActivatedByParent = false;
-		if (isAddedToRoot())
-			onRemovedFromRoot();
-	}
-	
-	override public function onAddedToRoot() : Void
+	override public function addToRoot() : Void
 	{
 		_isAddedToRoot = true;
-		updateActiveState();
+		onAddedToRoot();
 	}
 
 	override public function onRemovedFromRoot() : Void
 	{
+		onRemovedFromRoot();
+		
 		if(name != null)
 			core.root.clearCachedChild(parent.fullName + name);
 			
 		_isAddedToRoot = false;
-		updateActiveState();
+	}
+	
+	override function setFocus(focus:Bool):Void 
+	{
+		super.setFocus(focus);
+		if (focus)
+			onFocus();
+		else	
+			onLostFocus();
 	}
 }
 

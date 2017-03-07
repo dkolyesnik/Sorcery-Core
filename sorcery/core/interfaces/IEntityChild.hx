@@ -26,19 +26,20 @@ interface IEntityChild
 	function addAgenda(p_agenda:String):Void;
 	function removeAgenda(p_agenda:String):Void;
 
-	private function updateActiveState() : Void;
+	//private function updateActiveState() : Void;
 
-	private function onActivatedByParent():Void;
-	private function onDeactivatedByParent():Void;
+	//private function onActivatedByParent():Void;
+	//private function onDeactivatedByParent():Void;
+	private function activate():Void;
+	private function deactivate():Void;
 	
-	private function onAddedToParent(p_parent : IEntity) : Void;
-	private function onRemovedFromParent() : Void;
+	private function addToParent(p_parent:IEntity):Void;
+	private function removeFromParent():Void;
+	
 
-	private function onAddedToRoot() : Void;
-	private function onRemovedFromRoot() : Void;
+	private function addToRoot():Void;
+	private function removeFromRoot():Void;
 
 	private function setFocus(focus:Bool):Void;
-	private function onFocus() : Void;  // called when we switch back to some agenda like onFocus in Screen and ScreenManager
-	private function onLostFocus() : Void;  // called when we activate different agenda and this child is not a part of it
 }
 
