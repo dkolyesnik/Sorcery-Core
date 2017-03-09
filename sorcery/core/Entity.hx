@@ -35,6 +35,8 @@ using sorcery.core.tools.EntityTools;
 @:access(sorcery.core.interfaces.IComponent)
 class Entity extends sorcery.core.EntityChild implements IEntity implements IPoolable implements IAgendaManager implements HaxeContracts
 {
+	@:noCompletion
+	inline static var DUPLICATED_CHILD_NAME_EXCEPTIOM = "Error adding child with dublicated names";
 	/**
 	 * full name of the entity, unique identifier with consists of the groups's full name plus entity name
 	 * it looks like #.group1.group2.name
@@ -204,7 +206,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 			var entity:IEntity = cast child;
 			if (group != null && group.findEntity(entity.name) != null)
 			{
-				trace("Error adding entity with dublicated names, entity is replaced");
+				core.error(DUPLICATED_CHILD_NAME_EXCEPTIOM);
 				return;
 			}
 			_childrenByName[child.name] = child;
@@ -215,7 +217,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 			{
 				if (_childrenByName.exists(child.name))
 				{
-					trace("Error adding component with dublicated names, component is replaced");
+					core.error(DUPLICATED_CHILD_NAME_EXCEPTIOM);
 					return;
 				}
 				_childrenByName[child.name] = child;

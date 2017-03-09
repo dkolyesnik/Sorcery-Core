@@ -103,6 +103,11 @@ class Core implements ICore implements HaxeContracts
         trace(msg);
     }
 	
+	public function error(msg:String):Void
+	{
+		throw(msg);
+	}
+	
 	public function get_root():IEntityRoot
 	{
 		return root;

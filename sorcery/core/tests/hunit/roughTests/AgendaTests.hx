@@ -8,6 +8,7 @@ import hunit.TestCase;
  * ...
  * @author Dmitriy Kolyesnik
  */
+@:access(sorcery.core.Entity)
 class AgendaTests extends TestCase
 {
 
@@ -38,7 +39,7 @@ class AgendaTests extends TestCase
 		player.addChild(playerComp1);
 		var playerComp2:TestFocusComponent = cast new TestFocusComponent(core).setName("pc").addAgenda("pa2");
 		player.addChild(playerComp2);
-		var playerAlwaysComp:TestFocusComponent = cast new TestFocusComponent(core).setName("pc");
+		var playerAlwaysComp:TestFocusComponent = cast new TestFocusComponent(core).setName("pca");
 		player.addChild(playerAlwaysComp);
 		
 		game.addChild(player);
@@ -137,24 +138,26 @@ class AgendaTests extends TestCase
 		notice("gameComp1 should not be active");
 		assert.isFalse(gameComp1.isActivated(),  "gameComp1 is active");
 		
-		notice("searching for component named 'pc', playerAlwaysComp should be found");
-		assert.isTrue(player.findChild("pc") == playerAlwaysComp);
-		assert.isTrue(core.root.findChildByFullName("#.game.player:pc") == playerAlwaysComp);
+		notice("searching for component named 'pca', playerAlwaysComp should be found");
+		assert.isTrue(player.findChild("pca") == playerAlwaysComp);
+		assert.isTrue(core.root.findChildByFullName("#.player:pca") == playerAlwaysComp);
 		notice("switching player agenda to pa1");
 		player.agenda.swap("pa1");
-		notice("playerComp1 should be found instead of playerAlwaysComp");
+		notice("playerComp1 should be found");
 		assert.isTrue(player.findChild("pc") == playerComp1);
-		assert.isTrue(core.root.findChildByFullName("#.game.player:pc") == playerComp1);
-		notice("playerComp1 should be active and playerAlwaysComp not");
-		assert.isTrue(playerComp1.isActivated() && !playerAlwaysComp.isActivated(), "playerAlwaysComp is not replaced");
+		assert.isTrue(core.root.findChildByFullName("#.player:pc") == playerComp1);
+		assert.isTrue(playerComp1.isActivated(), "playerComp1 should be active");
+		assert.isTrue(playerAlwaysComp.isActivated(), "playerAlwaysComp should be active");
 		
-		notice("activaating pa2 agenda, should replace pa1");
-		player.agenda.show("pa2");
-		assert.isTrue(!playerComp1.isActivated() && playerComp2.isActivated(), "fail");
+		//notice("activaiting pa2 agenda, should replace pa1");
+		//expectException(Entity.DUPLICATED_CHILD_NAME_EXCEPTIOM);
+		//player.agenda.show("pa2");
 		
-		notice("hide all, should activate always again");
-		player.agenda.hideAll();
-		assert.isTrue(playerAlwaysComp.isActivated() && !playerComp1.isActivated() && !playerComp2.isActivated(), "fail");
+		//assert.isTrue(!playerComp1.isActivated() && playerComp2.isActivated(), "fail");
+		
+		//notice("hide all, should activate always again");
+		//player.agenda.hideAll();
+		//assert.isTrue(playerAlwaysComp.isActivated() && !playerComp1.isActivated() && !playerComp2.isActivated(), "fail");
 		
 	
 		
