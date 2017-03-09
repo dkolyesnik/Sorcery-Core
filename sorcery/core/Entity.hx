@@ -347,7 +347,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		
 		for (child in _children)
 			if(child.getUseByAgendaCount() > 0)
-				child.addToRoot();
+				_addChildToRoot(child);
 	}
 	
 	override function removeFromRoot():Void
@@ -356,7 +356,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		
 		for (child in _children)
 			if(child.isAddedToRoot())
-				child.removeFromRoot();
+				_removeChildFromRoot(child);
 		
 		_isAddedToRoot = false;
 		core.root.clearCachedChild(fullName);
