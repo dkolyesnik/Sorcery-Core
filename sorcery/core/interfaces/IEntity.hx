@@ -6,7 +6,7 @@ import sorcery.core.interfaces.IAgendaChild;
 import sorcery.core.interfaces.IAgendaManager;
 
 @:allow(sorcery.core.interfaces.IEntityGroup)
-interface IEntity extends IAgendaChild extends IEventSender extends IParent
+interface IEntity extends IEntityChild extends IEventSender extends IParent
 {
 	var fullName(get, never) : String;
 	var group(get, null) : IEntityGroup;
@@ -16,11 +16,11 @@ interface IEntity extends IAgendaChild extends IEventSender extends IParent
 	function isWrapped():Bool;
 	function isGroup():Bool;
 	
-	private function onAddToGroup(p_group : IEntityGroup) : Void;
-	private function onRemoveFromGroup() : Void;
+	private function addToGroup(p_group : IEntityGroup) : Void;
+	private function removeFromGroup() : Void;
 
-	@:allow(sorcery.core.interfaces.IEntityChild.addAgenda)
-	@:allow(sorcery.core.interfaces.IEntityChild.removeAgenda)
-	private function updateChildrenAgendaState():Void;
+	//@:allow(sorcery.core.interfaces.IEntityChild.addAgenda)
+	//@:allow(sorcery.core.interfaces.IEntityChild.removeAgenda)
+	//private function updateChildrenAgendaState():Void;
 }
 

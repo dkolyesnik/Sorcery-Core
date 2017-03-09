@@ -29,5 +29,6 @@ interface ICore
     function wrapInGroup(entity:IEntity) : IEntity;
     
 	function log(msg:String):Void;
+	function error(msg:String):Void;
 }
 

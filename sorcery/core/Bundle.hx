@@ -63,16 +63,16 @@ class Bundle extends Behavior implements IBundle
 		//need to be overridden
 	}
 
-	override function onAddedToParent(p_parent:IEntity):Void
+	override function addToParent(p_parent:IEntity):Void
 	{
 		core = p_parent.core;
-		super.onAddedToParent(p_parent);
+		super.addToParent(p_parent);
 	}
 	
-	override function onRemovedFromParent():Void 
+	override function removeFromParent():Void 
 	{
 		onUninitialize();
-		super.onRemovedFromParent();
+		super.removeFromParent();
 	}
 	
 	public function preInitialize():Void

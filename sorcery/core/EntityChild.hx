@@ -15,11 +15,12 @@ import sorcery.core.interfaces.IEntityChild;
  */
 class EntityChild implements IEntityChild implements HaxeContracts
 {
-	var _isActive = false;
-	var _isActivatedByParent = false;
+	//var _isActivatedByParent = false;
+	var _isActivated = false;
 	var _isAddedToRoot = false;
 	var _isFocused = false;
 	var _agendas:Map<String, Bool>;
+	var _useByAgendaCount = 0;
 	
 	private function new(p_core:ICore)
 	{
@@ -57,19 +58,9 @@ class EntityChild implements IEntityChild implements HaxeContracts
 		return false;
 	}
 
-	public function isActive():Bool
+	public function isActivated():Bool
 	{
-		return _isActive;
-	}
-	
-	public function isActivatedByParent():Bool
-	{
-		return _isActivatedByParent;
-	}
-
-	public function isFocused():Bool
-	{
-		return _isFocused;
+		return _isActivated;
 	}
 
 	public function isAddedToRoot() : Bool
@@ -94,6 +85,8 @@ class EntityChild implements IEntityChild implements HaxeContracts
 	{
 
 	}
+	
+	
 
 	public function hasAgenda(p_agenda:String):Bool
 	{
@@ -105,85 +98,155 @@ class EntityChild implements IEntityChild implements HaxeContracts
 		return _agendas.exists(p_agenda);
 	}
 
-	public function addAgenda(p_agenda:String):Void
+	public function addAgenda(p_agenda:String):IEntityChild
 	{
+		//TODO adding agenda when added to parent
 		Contract.requires(Agenda.validate(p_agenda));
 		Contract.ensures(_agendas.exists(p_agenda));
 		
-		if (_agendas == null)
+		if (parent == null)
+		{
+			if (_agendas == null)
 			_agendas = new Map();
 
-		if (!_agendas.exists(p_agenda))
-		{
-			_agendas[p_agenda] = true;
-			if (parent != null)
-				parent.updateChildrenAgendaState();
+			if (!_agendas.exists(p_agenda))
+			{
+				_agendas[p_agenda] = true;
+			}
 		}
+		
+		return this;
 	}
 
 	public function removeAgenda(p_agenda:String):Void
 	{
+		//TODO removing agenda when added to parent
 		Contract.requires(Agenda.validate(p_agenda));
 		Contract.ensures(_agendas == null || !_agendas.exists(p_agenda));
 		
-		if (_agendas != null && _agendas.remove(p_agenda))
+		if (parent == null)
 		{
-			if (parent != null)
-				parent.updateChildrenAgendaState();
+			if (_agendas != null) 
+			{
+				_agendas.remove(p_agenda);
+			}
 		}
 	}
-
-	function updateActiveState():Void
+	
+	function getUseByAgendaCount():Int
 	{
-
+		return _useByAgendaCount;
 	}
 	
-	function onActivatedByParent():Void
+	function resetUseByAgendaCount():Void
 	{
-		_isActivatedByParent = true;
+		_useByAgendaCount = 0;
 	}
 	
-	function onDeactivatedByParent():Void
+	/**
+	 * called when agenda is activated, check if it need to increase use count
+	 * @return true if has agenda and use count is increased
+	 */
+	function activateByAgenda(p_agenda:Agenda):Bool
 	{
-		_isActivatedByParent = false;
+		Contract.requires(Agenda.validate(p_agenda));
+		
+		if (_agendas == null)
+		{
+			if (p_agenda == BaseAgenda.ALWAYS)
+			{
+				_useByAgendaCount++;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		if (_agendas.exists(p_agenda))
+		{
+			_useByAgendaCount++;
+			return true;
+		}
+		else
+			return false;
 	}
-
-	function onAddedToParent(p_parent:IEntity):Void
+	
+	/**
+	 * called when agenda is deactivated, decrease use count if has this agenda
+	 * @return true if use count is decreased to 0 and we need to deactivate child
+	 */
+	function deactivateByAgends(p_agenda:Agenda):Bool
+	{
+		Contract.requires(Agenda.validate(p_agenda));
+		Contract.ensures(_useByAgendaCount >= 0);
+		
+		if (_agendas == null)
+		{
+			if (p_agenda == BaseAgenda.ALWAYS)
+			{
+				_useByAgendaCount--;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		if (_agendas.exists(p_agenda))
+		{
+			_useByAgendaCount--;
+			return _useByAgendaCount == 0;
+		}	
+		else
+			return false;
+	}
+	
+	function activate():Void
+	{
+		_isActivated = true;
+	}
+	function deactivate():Void
+	{
+		_isActivated = false;
+	}
+	
+	function addToParent(p_parent:IEntity):Void
 	{
 		Contract.requires(p_parent != null);
 		
 		parent = p_parent;
 	}
-
-	function onRemovedFromParent():Void
+	function removeFromParent():Void
 	{
 		Contract.ensures(parent == null);
 		
+		_useByAgendaCount = 0;
 		parent = null;
 	}
-
-	function onAddedToRoot():Void
+	
+	function addToRoot():Void
 	{
-
+		_isAddedToRoot = true;
 	}
-
-	function onRemovedFromRoot():Void
+	
+	function removeFromRoot():Void
 	{
-
+		_isAddedToRoot = false;
 	}
-
-	function setFocus(focus:Bool):Void
-	{
-		Contract.ensures(focus == _isFocused);
-		
-		if (_isFocused == focus)
-			return;
-		_isFocused = focus;
-		if (_isFocused)
-			onFocus();
-		else
-			onLostFocus();
-	}
+	
+	
+	//function onActivatedByParent():Void
+	//{
+		//_isActivatedByParent = true;
+	//}
+	//
+	//function onDeactivatedByParent():Void
+	//{
+		//_isActivatedByParent = false;
+	//}
 
 	function onFocus():Void
 	{

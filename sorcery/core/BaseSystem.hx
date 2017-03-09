@@ -22,23 +22,23 @@ class BaseSystem extends Behavior implements ISystem implements HaxeContracts
 		_createNodeListLinks();
 	}
 	
-	override function onAddedToParent(p_parent:IEntity):Void 
+	override function addToParent(p_parent:IEntity):Void 
 	{
 		Contract.requires(p_parent.name == CoreNames.ROOT);
 		
-		super.onAddedToParent(p_parent);
+		super.addToParent(p_parent);
 	}
 	
-	override public function onAddedToRoot():Void 
+	override function _doAddToRoot():Void 
 	{
-		super.onAddedToRoot();
+		super._doAddToRoot();
 		_getNodeLists();
 	}
 	
-	override public function onRemovedFromRoot():Void 
+	override function _doRemoveFromRoot():Void 
 	{
 		_releaseNodeLists();
-		super.onRemovedFromRoot();
+		super._doRemoveFromRoot();
 	}
 	
 	function update(e:CoreEvent):Void

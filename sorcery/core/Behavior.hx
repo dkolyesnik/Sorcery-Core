@@ -126,7 +126,7 @@ class Behavior extends Component implements IBehavior implements HaxeContracts
         enabled = value;
         (enabled) ? onEnable() : onDisable();
         
-        updateActiveState();
+        //updateActiveState();
         return value;
     }
 	
@@ -137,38 +137,39 @@ class Behavior extends Component implements IBehavior implements HaxeContracts
     // ==============================================================================
     // IEntityChild
     // ==============================================================================
-    override public function updateActiveState() : Void
-    {
-        var l_mustBeActive : Bool = enabled && _isAddedToRoot && parent.isActive();
-        if (_isActive == l_mustBeActive)
-        {
-            return;
-        }
-        _isActive = l_mustBeActive;
-        
-        if (_isActive)
-        {
-            onActivate();
-        }
-        else
-        {
-            onDeactivate();
-        }
-    }
+    //override public function updateActiveState() : Void
+    //{
+        //var l_mustBeActive : Bool = enabled && _isAddedToRoot && parent.isActive();
+        //if (_isActive == l_mustBeActive)
+        //{
+            //return;
+        //}
+        //_isActive = l_mustBeActive;
+        //
+        //if (_isActive)
+        //{
+            //onActivate();
+        //}
+        //else
+        //{
+            //onDeactivate();
+        //}
+    //}
    
-    override public function onAddedToRoot() : Void
-    {
-        super.onAddedToRoot();
+	override function _doAddToRoot():Void 
+	{
+		super._doAddToRoot();
 		_resolveLinks();
         registerEvents();
-    }
-    
-    override public function onRemovedFromRoot() : Void
-    {
+	}
+  
+	override function _doRemoveFromRoot():Void 
+	{
 		_resetLinks();
 		unregisterEvents();
-        super.onRemovedFromRoot();
-    }
+		super._doRemoveFromRoot();
+	}
+   
     
     // ==============================================================================
     // EVENTS

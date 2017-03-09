@@ -4,6 +4,7 @@ import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.IEntityChild;
 import sorcery.core.CoreNames;
 import sorcery.core.interfaces.IEntityRoot;
+import sorcery.core.interfaces.IComponent;
 
 /**
  * ...
@@ -14,7 +15,7 @@ class EntityTools
 	/**
 	 * find first child with name childName searching in parents up to root
 	 */
-	public static function findChildInParents(entity:IEntity, childName):IEntityChild
+	public static function findChildInParents(entity:IEntity, childName:String):IEntityChild
 	{
 		var par = entity.parent;
 		if (par != null)
@@ -24,6 +25,14 @@ class EntityTools
 				return child;
 			par = par.parent;
 		}
+		return null;
+	}
+	
+	public static function findComponent<T:IComponent>(entity:IEntity, componentName:String):T
+	{
+		var comp = entity.findChild(componentName);
+		if (comp != null)
+			return cast comp;
 		return null;
 	}
 	

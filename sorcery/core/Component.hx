@@ -31,14 +31,29 @@ class Component extends sorcery.core.EntityChild implements IComponent implement
 		return super.setName(p_name);
 	}
 
+	
 	function onActivate() : Void
 	{
+		//override
 	}
-
-	function onDeactivate() : Void
+	
+    function onDeactivate() : Void
 	{
+		//override
 	}
-
+	
+	@:noCompletion
+	function onAddedToRoot() : Void
+	{
+		//override
+	}
+	
+	@:noCompletion
+	function onRemovedFromRoot() : Void
+	{
+		//override
+	}
+	
 	// ==============================================================================
 	// IEntityChild
 	// ==============================================================================
@@ -47,54 +62,81 @@ class Component extends sorcery.core.EntityChild implements IComponent implement
 	}
 
 	
-	override function updateActiveState() : Void
+	//override function updateActiveState() : Void
+	//{
+		//var isMustBeActive : Bool = isAddedToRoot() && _isActivatedByParent && parent.isActive();
+//
+		//if (isMustBeActive == _isActive)
+		//{
+			//return;
+		//}
+//
+		//_isActive = isMustBeActive;
+//
+		//if (_isActive)
+		//{
+			//onActivate();
+		//}
+		//else
+		//{
+			//onDeactivate();
+		//}
+	//}
+	
+	//override function onActivatedByParent():Void
+	//{
+		//_isActivatedByParent = true;
+		//if (parent.isAddedToRoot())
+			//onAddedToRoot();
+	//}
+	//
+	//override function onDeactivatedByParent():Void
+	//{
+		//_isActivatedByParent = false;
+		//if (isAddedToRoot())
+			//onRemovedFromRoot();
+	//}
+	//
+	
+	override function activate():Void 
 	{
-		var isMustBeActive : Bool = isAddedToRoot() && _isActivatedByParent && parent.isActive();
-
-		if (isMustBeActive == _isActive)
-		{
-			return;
-		}
-
-		_isActive = isMustBeActive;
-
-		if (_isActive)
-		{
-			onActivate();
-		}
-		else
-		{
-			onDeactivate();
-		}
+		_isActivated = true;
+		onActivate();
 	}
 	
-	override function onActivatedByParent():Void
+	override function deactivate():Void 
 	{
-		_isActivatedByParent = true;
-		if (parent.isAddedToRoot())
-			onAddedToRoot();
+		onDeactivate();
+		_isActivated = false;
 	}
 	
-	override function onDeactivatedByParent():Void
+	override public function addToRoot() : Void
 	{
-		_isActivatedByParent = false;
-		if (isAddedToRoot())
-			onRemovedFromRoot();
+		_doAddToRoot();
+		onAddedToRoot();
 	}
 	
-	override public function onAddedToRoot() : Void
+	@:noCompletion
+	function _doAddToRoot():Void
 	{
 		_isAddedToRoot = true;
-		updateActiveState();
 	}
-
-	override public function onRemovedFromRoot() : Void
+	
+	override public function removeFromRoot() : Void
+	{
+		onRemovedFromRoot();
+		
+		_doRemoveFromRoot();
+	}
+	
+	@:noCompletion
+	function _doRemoveFromRoot():Void
 	{
 		if(name != null)
 			core.root.clearCachedChild(parent.fullName + name);
 			
 		_isAddedToRoot = false;
-		updateActiveState();
 	}
+
 }
 
