@@ -100,17 +100,19 @@ class EntityChild implements IEntityChild implements HaxeContracts
 
 	public function addAgenda(p_agenda:String):IEntityChild
 	{
-		//TODO NEW update agenda state 
+		//TODO adding agenda when added to parent
 		Contract.requires(Agenda.validate(p_agenda));
 		Contract.ensures(_agendas.exists(p_agenda));
 		
-		if (_agendas == null)
+		if (parent == null)
+		{
+			if (_agendas == null)
 			_agendas = new Map();
 
-		if (!_agendas.exists(p_agenda))
-		{
-			_agendas[p_agenda] = true;
-			//if (parent != null)
+			if (!_agendas.exists(p_agenda))
+			{
+				_agendas[p_agenda] = true;
+			}
 		}
 		
 		return this;
@@ -118,14 +120,16 @@ class EntityChild implements IEntityChild implements HaxeContracts
 
 	public function removeAgenda(p_agenda:String):Void
 	{
-		//TODO NEW update agenda state
+		//TODO removing agenda when added to parent
 		Contract.requires(Agenda.validate(p_agenda));
 		Contract.ensures(_agendas == null || !_agendas.exists(p_agenda));
 		
-		if (_agendas != null && _agendas.remove(p_agenda))
+		if (parent == null)
 		{
-			//if (parent != null)
-				//parent.updateChildrenAgendaState();
+			if (_agendas != null) 
+			{
+				_agendas.remove(p_agenda);
+			}
 		}
 	}
 	

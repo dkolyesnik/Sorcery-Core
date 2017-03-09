@@ -61,7 +61,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	public function new(p_core:ICore)
 	{
 		Contract.requires(p_core != null);
-		Contract.ensures(core == p_core && _isActivatedByParent == _isActive == _isAddedToRoot == _isFocused == _isDestroyed == false);
+		Contract.ensures(core == p_core && _isActived == _isAddedToRoot == _isDestroyed == false);
 
 		super(p_core);
 		_isDestroyed = false;
