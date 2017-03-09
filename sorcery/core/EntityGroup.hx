@@ -48,7 +48,7 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 			trace("Warning: group must have a name");
 			entity.setName(core.factory.generateName());
 		}
-		entity.onAddToGroup(this);
+		entity.addToGroup(this);
 	}
 
 	// ==============================================================================
@@ -102,50 +102,32 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 		return _wrappedEntity.setName(p_name);
 	}
 
-	public function isActive() : Bool
+	public function isActivated():Bool
 	{
-		return _wrappedEntity.isActive();
-	}
-	
-	public function isActivatedByParent():Bool
-	{
-		return _wrappedEntity.isActivatedByParent();
+		return _wrappedEntity.isActivated();
 	}
 
-	function updateActiveState() : Void
+	function activate():Void
 	{
-		_wrappedEntity.updateActiveState();
+		_wrappedEntity.activate();
 	}
 	
-	function onActivatedByParent():Void
+	function deactivate():Void
 	{
-		if (_wrappedEntity.parent.group != null)
-		{
-			onAddToGroup(_wrappedEntity.parent.group);
-		}
-		_wrappedEntity.onActivatedByParent();
+		_wrappedEntity.deactivate();
 	}
 	
-	function onDeactivatedByParent():Void
+	function addToParent(p_parent : IEntity) : Void
 	{
-		if (parentGroup != null)
-		{
-			onRemoveFromGroup();
-		}
-		_wrappedEntity.onDeactivatedByParent();
+		_wrappedEntity.addToParent(p_parent);
 	}
 
-	function onAddedToParent(p_parent : IEntity) : Void
+	function removeFromParent() : Void
 	{
-		_wrappedEntity.onAddedToParent(p_parent);
-	}
-
-	function onRemovedFromParent() : Void
-	{
-		_wrappedEntity.onRemovedFromParent();
+		_wrappedEntity.removeFromParent();
 	}
 	
-	function onAddToGroup(p_group : IEntityGroup) : Void
+	function addToGroup(p_group : IEntityGroup) : Void
 	{
 		Contract.requires(p_group != null && !(parentGroup != null && parentGroup != p_group));
 		
@@ -156,21 +138,23 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 		parentGroup.registerEntity(this);
 	}
 
-	function onRemoveFromGroup() : Void
+	function removeFromGroup() : Void
 	{
 		Contract.ensures(parentGroup == null);
 		
 		parentGroup = null;
 	}
 
-	function onAddedToRoot() : Void
+	function addToRoot() : Void
 	{
-		_wrappedEntity.onAddedToRoot();
+		addToGroup(parent.group);
+		_wrappedEntity.addToRoot();
 	}
 
-	function onRemovedFromRoot() : Void
+	function removeFromRoot() : Void
 	{
-		_wrappedEntity.onRemovedFromRoot();
+		_wrappedEntity.removeFromRoot();
+		removeFromGroup();
 	}
 
 	public function destroy() : Void
@@ -205,11 +189,13 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 		_wrappedEntity.sendEvent(event);
 	}
 
-	public function addAgenda(p_agenda:String):Void
+	public function addAgenda(p_agenda:String):IEntityChild
 	{
 		Contract.requires(Agenda.validate(p_agenda));
 		
 		_wrappedEntity.addAgenda(p_agenda);
+		
+		return this;
 	}
 
 	public function removeAgenda(p_agenda:String):Void
@@ -225,15 +211,25 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 		
 		return _wrappedEntity.hasAgenda(p_agenda);
 	}
-
-	public function isFocused():Bool
+	
+	function getUseByAgendaCount():Int
 	{
-		return _wrappedEntity.isFocused();
+		return _wrappedEntity.getUseByAgendaCount();
 	}
-
-	function setFocus(focus:Bool):Void
+	
+	function resetUseByAgendaCount():Void
 	{
-		_wrappedEntity.setFocus(focus);
+		_wrappedEntity.resetUseByAgendaCount();
+	}
+	
+	function activateByAgenda(p_agenda:Agenda):Bool
+	{
+		return _wrappedEntity.activateByAgenda(p_agenda);
+	}
+	
+	function deactivateByAgends(p_agenda:Agenda):Bool
+	{
+		return _wrappedEntity.deactivateByAgends(p_agenda);
 	}
 
 	function onFocus() : Void
@@ -244,11 +240,6 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 	function onLostFocus() : Void
 	{
 		_wrappedEntity.onLostFocus();
-	}
-
-	function updateChildrenAgendaState():Void
-	{
-		_wrappedEntity.updateChildrenAgendaState();
 	}
 
 	// ==============================================================================

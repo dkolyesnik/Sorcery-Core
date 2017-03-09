@@ -6,7 +6,7 @@ import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.IAgendaChild;
 
 
-interface IComponent extends IAgendaChild
+interface IComponent extends IEntityChild
 {
 	private function onActivate() : Void;
     private function onDeactivate() : Void;
@@ -17,7 +17,7 @@ interface IComponent extends IAgendaChild
 	private function onAddedToRoot() : Void;
 	private function onRemovedFromRoot() : Void;
 	
-	private function onFocus() : Void;  // called when we switch back to some agenda like onFocus in Screen and ScreenManager
-	private function onLostFocus() : Void;  // called when we activate different agenda and this child is not a part of it
+	private function onFocus():Void;
+	private function onLostFocus():Void;
 }
 

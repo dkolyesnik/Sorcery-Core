@@ -87,7 +87,19 @@ class Enitiy2 extends EntityChild implements IEntity implements IPoolable implem
 				}
 				_childrenByName[child.name] = child;
 			}
-			
+			else
+			{
+				if (child.name != null)
+				{
+					if (_childrenByName.exists(child.name))
+					{
+						trace("Error adding component with dublicated names, component is destroyed");
+						child.destroy();
+						return;
+					}
+					_childrenByName[child.name] = child;
+				}
+			}
 			child.onActivatedByParent();
 		}
 		//check if it must be focused

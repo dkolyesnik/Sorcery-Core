@@ -156,19 +156,20 @@ class Behavior extends Component implements IBehavior implements HaxeContracts
         //}
     //}
    
-    override public function addToRoot() : Void
-    {
-        super.addToRoot();
+	override function _doAddToRoot():Void 
+	{
+		super._doAddToRoot();
 		_resolveLinks();
         registerEvents();
-    }
-    
-    override public function removeFromRoot() : Void
-    {
+	}
+  
+	override function _doRemoveFromRoot():Void 
+	{
 		_resetLinks();
 		unregisterEvents();
-        super.removeFromRoot();
-    }
+		super._doRemoveFromRoot();
+	}
+   
     
     // ==============================================================================
     // EVENTS

@@ -31,6 +31,7 @@ class Component extends sorcery.core.EntityChild implements IComponent implement
 		return super.setName(p_name);
 	}
 
+	
 	function onActivate() : Void
 	{
 		//override
@@ -41,26 +42,18 @@ class Component extends sorcery.core.EntityChild implements IComponent implement
 		//override
 	}
 	
+	@:noCompletion
 	function onAddedToRoot() : Void
 	{
 		//override
 	}
 	
+	@:noCompletion
 	function onRemovedFromRoot() : Void
 	{
 		//override
 	}
 	
-	function onFocus() : Void
-	{
-		//override
-	}
-	
-	function onLostFocus() : Void
-	{
-		//override
-	}
-
 	// ==============================================================================
 	// IEntityChild
 	// ==============================================================================
@@ -107,37 +100,43 @@ class Component extends sorcery.core.EntityChild implements IComponent implement
 	
 	override function activate():Void 
 	{
+		_isActivated = true;
 		onActivate();
 	}
 	
 	override function deactivate():Void 
 	{
 		onDeactivate();
+		_isActivated = false;
 	}
 	
 	override public function addToRoot() : Void
 	{
-		_isAddedToRoot = true;
+		_doAddToRoot();
 		onAddedToRoot();
 	}
-
-	override public function onRemovedFromRoot() : Void
+	
+	@:noCompletion
+	function _doAddToRoot():Void
+	{
+		_isAddedToRoot = true;
+	}
+	
+	override public function removeFromRoot() : Void
 	{
 		onRemovedFromRoot();
 		
+		_doRemoveFromRoot();
+	}
+	
+	@:noCompletion
+	function _doRemoveFromRoot():Void
+	{
 		if(name != null)
 			core.root.clearCachedChild(parent.fullName + name);
 			
 		_isAddedToRoot = false;
 	}
-	
-	override function setFocus(focus:Bool):Void 
-	{
-		super.setFocus(focus);
-		if (focus)
-			onFocus();
-		else	
-			onLostFocus();
-	}
+
 }
 

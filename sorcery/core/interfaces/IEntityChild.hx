@@ -6,16 +6,14 @@ import sorcery.core.interfaces.ICore;
 
 @:allow(sorcery.core.interfaces.IEntity)
 @:allow(sorcery.core.interfaces.IEntityChildLink)
-interface IEntityChild
+interface IEntityChild extends IAgendaChild
 {
 	var core(get, null):ICore;
 	var parent(get, null) : IEntity;
 	var name(get, null) : String;
 	
 	function isEntity():Bool;
-	function isActive() : Bool;
-	function isFocused():Bool;
-	function isActivatedByParent():Bool;
+	function isActivated():Bool;
 	function isAddedToRoot() : Bool;
 
 	function setName(p_name : String) : IEntityChild;
@@ -23,7 +21,7 @@ interface IEntityChild
 	function destroy() : Void;
 
 	function hasAgenda(p_agenda:String):Bool;
-	function addAgenda(p_agenda:String):Void;
+	function addAgenda(p_agenda:String):IEntityChild;
 	function removeAgenda(p_agenda:String):Void;
 
 	//private function updateActiveState() : Void;
@@ -39,7 +37,8 @@ interface IEntityChild
 
 	private function addToRoot():Void;
 	private function removeFromRoot():Void;
-
-	private function setFocus(focus:Bool):Void;
+	
+	private function onFocus():Void;
+	private function onLostFocus():Void;
 }
 

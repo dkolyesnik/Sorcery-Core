@@ -5,10 +5,11 @@ package sorcery.core.interfaces;
 import sorcery.core.abstracts.Agenda;
 
 @:allow(sorcery.core.interfaces.IAgendaManager)
-interface IAgendaChild extends IEntityChild
+interface IAgendaChild
 {
-	function getUseByAgendaCount():Int;
-	function activateByAgenda(p_agenda:Agenda):Bool;
-	function deactivateByAgends(p_agenda:Agenda):Bool;
+	private function getUseByAgendaCount():Int;
+	private function resetUseByAgendaCount():Void;
+	private function activateByAgenda(p_agenda:Agenda):Bool;
+	private function deactivateByAgends(p_agenda:Agenda):Bool;
 }
 

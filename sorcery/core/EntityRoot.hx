@@ -178,7 +178,6 @@ private class EntityForRoot extends Entity
 	public function new(p_core:ICore)
 	{
 		super(p_core);
-		_isActive = true;
 		_isAddedToRoot = true;
 		name = CoreNames.ROOT;
 	}
@@ -196,11 +195,6 @@ private class EntityForRoot extends Entity
 	override function get_enabled():Bool
 	{
 		return false;
-	}
-
-	override function updateActiveState():Void
-	{
-
 	}
 
 	override function get_fullName():String

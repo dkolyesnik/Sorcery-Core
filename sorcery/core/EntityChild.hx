@@ -16,6 +16,7 @@ import sorcery.core.interfaces.IEntityChild;
 class EntityChild implements IEntityChild implements HaxeContracts
 {
 	//var _isActivatedByParent = false;
+	var _isActivated = false;
 	var _isAddedToRoot = false;
 	var _isFocused = false;
 	var _agendas:Map<String, Bool>;
@@ -57,14 +58,9 @@ class EntityChild implements IEntityChild implements HaxeContracts
 		return false;
 	}
 
-	public function isActivatedByParent():Bool
+	public function isActivated():Bool
 	{
-		return _isActivatedByParent;
-	}
-
-	public function isFocused():Bool
-	{
-		return _isFocused;
+		return _isActivated;
 	}
 
 	public function isAddedToRoot() : Bool
@@ -102,8 +98,9 @@ class EntityChild implements IEntityChild implements HaxeContracts
 		return _agendas.exists(p_agenda);
 	}
 
-	public function addAgenda(p_agenda:String):Void
+	public function addAgenda(p_agenda:String):IEntityChild
 	{
+		//TODO NEW update agenda state 
 		Contract.requires(Agenda.validate(p_agenda));
 		Contract.ensures(_agendas.exists(p_agenda));
 		
@@ -113,26 +110,33 @@ class EntityChild implements IEntityChild implements HaxeContracts
 		if (!_agendas.exists(p_agenda))
 		{
 			_agendas[p_agenda] = true;
-			if (parent != null)
-				parent.updateChildrenAgendaState();
+			//if (parent != null)
 		}
+		
+		return this;
 	}
 
 	public function removeAgenda(p_agenda:String):Void
 	{
+		//TODO NEW update agenda state
 		Contract.requires(Agenda.validate(p_agenda));
 		Contract.ensures(_agendas == null || !_agendas.exists(p_agenda));
 		
 		if (_agendas != null && _agendas.remove(p_agenda))
 		{
-			if (parent != null)
-				parent.updateChildrenAgendaState();
+			//if (parent != null)
+				//parent.updateChildrenAgendaState();
 		}
 	}
 	
 	function getUseByAgendaCount():Int
 	{
 		return _useByAgendaCount;
+	}
+	
+	function resetUseByAgendaCount():Void
+	{
+		_useByAgendaCount = 0;
 	}
 	
 	/**
@@ -142,6 +146,19 @@ class EntityChild implements IEntityChild implements HaxeContracts
 	function activateByAgenda(p_agenda:Agenda):Bool
 	{
 		Contract.requires(Agenda.validate(p_agenda));
+		
+		if (_agendas == null)
+		{
+			if (p_agenda == BaseAgenda.ALWAYS)
+			{
+				_useByAgendaCount++;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 		
 		if (_agendas.exists(p_agenda))
 		{
@@ -161,6 +178,19 @@ class EntityChild implements IEntityChild implements HaxeContracts
 		Contract.requires(Agenda.validate(p_agenda));
 		Contract.ensures(_useByAgendaCount >= 0);
 		
+		if (_agendas == null)
+		{
+			if (p_agenda == BaseAgenda.ALWAYS)
+			{
+				_useByAgendaCount--;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
 		if (_agendas.exists(p_agenda))
 		{
 			_useByAgendaCount--;
@@ -172,11 +202,11 @@ class EntityChild implements IEntityChild implements HaxeContracts
 	
 	function activate():Void
 	{
-		
+		_isActivated = true;
 	}
 	function deactivate():Void
 	{
-		
+		_isActivated = false;
 	}
 	
 	function addToParent(p_parent:IEntity):Void
@@ -214,28 +244,14 @@ class EntityChild implements IEntityChild implements HaxeContracts
 		//_isActivatedByParent = false;
 	//}
 
-
-	function setFocus(focus:Bool):Void
+	function onFocus():Void
 	{
-		Contract.ensures(focus == _isFocused);
-		
-		//if (_isFocused == focus)
-			//return;
-		_isFocused = focus;
-		//if (_isFocused)
-			//onFocus();
-		//else
-			//onLostFocus();
+
 	}
 
-	//function onFocus():Void
-	//{
-//
-	//}
-//
-	//function onLostFocus():Void
-	//{
-//
-	//}
+	function onLostFocus():Void
+	{
+
+	}
 
 }
