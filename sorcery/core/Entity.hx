@@ -529,13 +529,18 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 			{
 				child.resetUseByAgendaCount();
 
-				if (!child.hasAgenda(BaseAgenda.ALWAYS))
+				if (child.isAddedToRoot())
 				{
-					child.deactivate();
-					selected.push(child);
+					if (!child.hasAgenda(BaseAgenda.ALWAYS))
+					{
+						if(child.isActivated())
+							child.deactivate();
+						selected.push(child);
+					}
+					else
+						child.activateByAgenda(BaseAgenda.ALWAYS);
 				}
-				else
-					child.activateByAgenda(BaseAgenda.ALWAYS);
+				
 			}
 			for (child in selected)
 				_removeChildFromRoot(child);
@@ -559,16 +564,20 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 			var selected = [];
 			for (child in _children)
 			{
-				child.resetUseByAgendaCount();
-				if (!child.hasAgenda(BaseAgenda.ALWAYS) && !child.hasAgenda(p_agenda))
+				if (child.isAddedToRoot())
 				{
-					child.deactivate();
-					selected.push(child);
-				}
-				else
-				{
-					child.activateByAgenda(BaseAgenda.ALWAYS);
-					child.activateByAgenda(p_agenda);
+					child.resetUseByAgendaCount();
+					if(!child.hasAgenda(BaseAgenda.ALWAYS) && !child.hasAgenda(p_agenda))
+					{
+						if(child.isActivated())
+							child.deactivate();
+						selected.push(child);
+					}
+					else
+					{
+						child.activateByAgenda(BaseAgenda.ALWAYS);
+						child.activateByAgenda(p_agenda);
+					}
 				}
 			}
 			

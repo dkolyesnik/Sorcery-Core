@@ -227,7 +227,7 @@ class HandlersList
 		_addLaterEnd = null;
 	}
 
-	inline function _addItem(item : HandlerData) : Void
+	function _addItem(item : HandlerData) : Void
 	{
 		if (head.next == end)
 		{
@@ -236,7 +236,7 @@ class HandlersList
 			end.prev = item;
 			item.next = end;
 		}
-		else if (end.prev.priority < item.priority)
+		else if (end.prev.priority <= item.priority)
 		{
 			end.prev.next = item;
 			item.prev = end.prev;
