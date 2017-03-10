@@ -82,13 +82,8 @@ class Behavior extends Component implements IBehavior implements HaxeContracts
             return;
         }
         
-        var i : Int = 0;
-        var len : Int = _handlers.length;
-        while (i < len)
-        {
-            _registerEvent(_handlers[i]);
-            i++;
-        }
+     	for (handler in _handlers)
+			_registerEvent(handler);
     }
     
     function unregisterEvents() : Void
@@ -98,22 +93,15 @@ class Behavior extends Component implements IBehavior implements HaxeContracts
             return;
         }
         
-        var i : Int = 0;
-        var len : Int = _handlers.length;
-        while (i < len)
-        {
-			_handlers[i].unregister();
-        }
+		for (handler in _handlers)
+			handler.unregister();
+		
     }
     
     function _registerEvent(handlerData : HandlerData) : Void
     {
-        if (!_isAddedToRoot)
-        {
-            return;
-        }
-        
-        core.notificator.addHandler(handlerData);
+        if (_isAddedToRoot)
+             core.notificator.addHandler(handlerData);
     }
     
     function set_enabled(value : Bool) : Bool
