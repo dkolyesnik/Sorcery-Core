@@ -204,21 +204,24 @@ class EntityChild implements IEntityChild implements HaxeContracts
 			return false;
 	}
 	
+	@:noCompletion
 	function activate():Void
 	{
 		_isActivated = true;
 	}
+	@:noCompletion
 	function deactivate():Void
 	{
 		_isActivated = false;
 	}
-	
+	@:noCompletion
 	function addToParent(p_parent:IEntity):Void
 	{
 		Contract.requires(p_parent != null);
 		
 		parent = p_parent;
 	}
+	@:noCompletion
 	function removeFromParent():Void
 	{
 		Contract.ensures(parent == null);
@@ -226,12 +229,12 @@ class EntityChild implements IEntityChild implements HaxeContracts
 		_useByAgendaCount = 0;
 		parent = null;
 	}
-	
+	@:noCompletion
 	function addToRoot():Void
 	{
 		_isAddedToRoot = true;
 	}
-	
+	@:noCompletion
 	function removeFromRoot():Void
 	{
 		_isAddedToRoot = false;
@@ -247,12 +250,12 @@ class EntityChild implements IEntityChild implements HaxeContracts
 	//{
 		//_isActivatedByParent = false;
 	//}
-
+	@:noCompletion
 	function onFocus():Void
 	{
 
 	}
-
+	@:noCompletion
 	function onLostFocus():Void
 	{
 
