@@ -42,6 +42,7 @@ class AgendaTests extends TestCase
 		var playerAlwaysComp:TestFocusComponent = cast new TestFocusComponent(core).setName("pca");
 		player.addChild(playerAlwaysComp);
 		
+		
 		game.addChild(player);
 		
 		core.root.addChild(game);
@@ -159,8 +160,17 @@ class AgendaTests extends TestCase
 		//player.agenda.hideAll();
 		//assert.isTrue(playerAlwaysComp.isActivated() && !playerComp1.isActivated() && !playerComp2.isActivated(), "fail");
 		
-	
-		
+		notice("Removing game from root");
+		core.root.removeChild(game);
+		assert.isFalse(game.isActivated(), "game should not be activated");
+		assert.isFalse(game.isAddedToRoot(), 'game should not be addedToRoot');
+		assert.isTrue(game.parent == null, "game paretn should be null");
+		assert.isFalse(player.isActivated(), 'player should not be active');
+		assert.isFalse(player.isAddedToRoot());
+		assert.isFalse(gameComp1.isActivated() && gameComp2.isActivated());
+		assert.isFalse(gameComp1.isAddedToRoot() && gameComp2.isAddedToRoot());
+		assert.isFalse(playerAlwaysComp.isActivated());
+		assert.isFalse(playerAlwaysComp.isAddedToRoot());
 		
 		
 	}

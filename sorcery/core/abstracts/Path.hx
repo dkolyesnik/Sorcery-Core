@@ -84,7 +84,7 @@ abstract Path(String) from String to String
 	
 	static function resolveParentsPath(s:String, entity:IEntity):String
 	{
-		var parent = entity.parent;
+		var parent = entity;
 		for (i in 1...s.length)
 		{
 			var c = s.charAt(i);

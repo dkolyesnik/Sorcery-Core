@@ -51,13 +51,15 @@ class EntityRootTests extends TestCase
 		gunEntity.addChild(cmp);
 		
 		var link = cmp.createLink("#.game.player.gun:comp");
+		var parentLink = cmp.createLink('@');
 		
 		var finded:IEntityChild = null; 
 		
 		
-		assert.isTrue(cmp.isAddedToRoot(), "comp is not added to root");
+		assert.isTrue(cmp.isAddedToRoot(), "comp should be added to root");
 		
 		assert.equal(link.fullName, "#.game.player.gun:comp", "link's full name is not valid");
+		assert.equal(parentLink.fullName, "#.game.player.gun", "parentLink full name is wrong");
 		
 
 		finded = core.root.findChildByFullName("#.game.child1");
@@ -69,7 +71,7 @@ class EntityRootTests extends TestCase
 		
 
 		finded =  link.findChild();
-		assert.equal(finded, cmp, "comp is not found by link");
+		assert.equal(finded, cmp, "comp should be found by link");
 
 		var gunFullName = gunEntity.fullName;
 		assert.equal(gunFullName, "#.game.player.gun", "gun has a wrong full name, full name = " + gunFullName);
