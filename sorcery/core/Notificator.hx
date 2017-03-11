@@ -248,10 +248,14 @@ class HandlersList
 			var iterator = getIterator();
 			for ( handlerData in iterator)
 			{
+				$type(handlerData);
+				trace(handlerData._link.fullName);
+				trace(handlerData.priority);
 				if (handlerData.priority > item.priority)
 				{
 					item.next = handlerData;
 					item.prev = handlerData.prev;
+					handlerData.prev.next = item;
 					handlerData.prev = item;
 					break;
 				}
