@@ -45,6 +45,10 @@ class AgendaTests extends TestCase
 		
 		game.addChild(player);
 		
+		notice("should be able to find children before added to root");
+		assert.isTrue(game.findChild("player") == player, "player should be found");
+		assert.isTrue(player.findChild("pca") == playerAlwaysComp);
+		
 		core.root.addChild(game);
 		
 		//testing switching agenda 
