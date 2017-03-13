@@ -49,7 +49,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	public var enabled(get, set) : Bool = true;
 
 	var _pool : IPool;
-	
+
 	var _isDestroyed = false;
 
 	//CHILDREN
@@ -70,13 +70,13 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		_activeAgendas = [BaseAgenda.ALWAYS];
 	}
 
-	override public function setName(p_name:String):IEntityChild 
+	override public function setName(p_name:String):IEntityChild
 	{
 		Contract.requires(EntityName.validate(p_name));
-		
+
 		return super.setName(p_name);
 	}
-	
+
 	// ==============================================================================
 	// GETTERS & SETTERS
 	// ==============================================================================
@@ -110,7 +110,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	function get_fullName():String
 	{
 		Contract.ensures(Contract.result == null || FullName.validate(Contract.result));
-		
+
 		if (_isAddedToRoot)
 			return group.fullName + "." + name;
 		else
@@ -124,12 +124,12 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	{
 		return group != null ? group.name == name : false;
 	}
-	
+
 	public function isGroup():Bool
 	{
 		return false;
 	}
-	
+
 	override public function destroy() : Void
 	{
 		Contract.ensures(_children.length == 0);
@@ -154,7 +154,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		Contract.ensures(EntityTools.checkWhetherChildCanBeAdded(this, child));
 		Contract.ensures(_children.indexOf(child) >= 0);
 		Contract.ensures(child.parent == this);
-		
+
 		//adding as not active child
 		if (child.isEntity())
 		{
@@ -180,36 +180,42 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		}
 		_children.push(child);
 		child.addToParent(this);
-		
+
 		//update useByAgendaCound
 		for (agendaName in _activeAgendas)
 			child.activateByAgenda(agendaName);
-			
-		//adding to root if this entity is added to root and child is used by agenda
-		if (_isAddedToRoot && child.getUseByAgendaCount() > 0)
+
+		if (child.getUseByAgendaCount() > 0)
 		{
-			_addChildToRoot(child);
-				
-			child.activate();
-			
-			if (child.hasAgenda(getCurrentAgenda()))
-				child.onFocus();
+			_addChildToHierarchy(child);
+			//adding to root if this entity is added to root and child is used by agenda
+			if (_isAddedToRoot)
+			{
+				child.addToRoot();
+
+				child.activate();
+
+				if (child.hasAgenda(getCurrentAgenda()))
+					child.onFocus();
+			}
 		}
-		
 		return child;
 	}
-	
-	function _addChildToRoot(child:IEntityChild):Void
+
+	function _addChildToHierarchy(child:IEntityChild):Void
 	{
 		if (child.isEntity())
 		{
 			var entity:IEntity = cast child;
-			if (group != null && group.findEntity(entity.name) != null)
+			if (_childrenByName.exists(child.name))
 			{
 				core.error(DUPLICATED_CHILD_NAME_EXCEPTIOM);
 				return;
 			}
 			_childrenByName[child.name] = child;
+
+			if (group != null)
+				entity.addToGroup(group);
 		}
 		else
 		{
@@ -223,26 +229,26 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 				_childrenByName[child.name] = child;
 			}
 		}
-		child.addToRoot();
+
 	}
-	
+
 	public function removeChild(child : IEntityChild) : IEntityChild
 	{
 		Contract.requires(child != null);
 		Contract.requires(child.parent == this);
 		Contract.ensures(_children.indexOf(child) == -1);
 		Contract.ensures(child.parent == null && child.isActivatedByParent() == false && child.isActive() == false && child.isAddedToRoot() == false);
-		
-		
+
 		if (child.parent == this)
 		{
+			var childEntity:IEntity;
 			if (child.isEntity())
 			{
 				//get wrapper if entity is wrapped in a group
-				var ent:IEntity = cast child;
-				if (ent.isWrapped())
-					ent = cast ent.group;
-				child = ent;
+				childEntity = cast child;
+				if (childEntity.isWrapped())
+					childEntity = cast childEntity.group;
+				child = childEntity;
 			}
 			if (_isAddedToRoot)
 			{
@@ -254,54 +260,55 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 							child.onLostFocus();
 						child.deactivate();
 					}
-					_removeChildFromRoot(child);
+					child.removeFromRoot();
 				}
 			}
+			_removeChildFromHierarchy(child);
 			child.removeFromParent();
 			_children.remove(child);
 		}
-			
-		
-		//_deactivateChild(child);
-		//child.onRemovedFromParent();
-		//if (_children.remove(child))
-		//{
-			//updateChildrenAgendaState();
-			//return child;
-		//}
+
 		return child;
 	}
-	
-	function _removeChildFromRoot(child:IEntityChild) 
+
+	function _removeChildFromHierarchy(child:IEntityChild)
 	{
-		if (child.name != null && _childrenByName[child.name] == child)
+		if (child.name != null && _childrenByName.exists(child.name) && _childrenByName[child.name] == child)
+		{
 			_childrenByName.remove(child.name);
-		child.removeFromRoot();
+			if (child.isEntity())
+			{
+				var childEntity:IEntity = cast child;
+				if (childEntity != null)
+					childEntity.removeFromGroup();
+			}
+
+		}
 	}
 
 	public function findChild(p_name:String):IEntityChild
 	{
 		Contract.requires(ComponentName.validate(p_name) || EntityName.validate(p_name));
- 		
+
 		return _childrenByName[p_name];
 	}
 
 	public function sendEvent(event : IEvent) : Void
 	{
 		Contract.requires(event != null);
-		
-		if(_isAddedToRoot)
+
+		if (_isAddedToRoot)
 			core.notificator.sendEvent(event, fullName);
 	}
-	
+
 	// ==============================================================================
 	// IEntityChild
 	// ==============================================================================
 	override public function isEntity():Bool
 	{
-		return true; 
+		return true;
 	}
-	
+
 	override function activate():Void
 	{
 		//TODO optimize
@@ -322,7 +329,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		for (child in focusedChildren)
 			child.onFocus();
 	}
-	
+
 	override function deactivate():Void
 	{
 		//TODO optimize
@@ -331,60 +338,79 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		for (child in _children)
 			if (child.hasAgenda(getCurrentAgenda()))
 				child.onLostFocus();
-				
+
 		for (child in _children)
 			if (child.isActivated())
 				child.deactivate();
 		_isActivated = false;
 	}
-	
+
 	override function addToRoot():Void
 	{
 		Contract.ensures(_isAddedToRoot == true);
-		
+
 		_isAddedToRoot = true;
 
-		if (!isWrapped())
-			addToGroup(parent.group);
-		
 		for (child in _children)
-			if(child.getUseByAgendaCount() > 0)
-				_addChildToRoot(child);
+			if (child.getUseByAgendaCount() > 0)
+				child.addToRoot();
 	}
-	
+
 	override function removeFromRoot():Void
 	{
 		Contract.ensures(_isAddedToRoot == false);
-		
+
 		for (child in _children)
-			if(child.isAddedToRoot())
-				_removeChildFromRoot(child);
-		
+			if (child.isAddedToRoot())
+				child.removeFromRoot();
+
 		_isAddedToRoot = false;
 		core.root.clearCachedChild(fullName);
-			
+
 		if (!isWrapped())
 			removeFromGroup();
 	}
-	
+
 	function addToGroup(p_group : IEntityGroup) : Void
 	{
 		Contract.requires(p_group != null && !(group != null && group != p_group));
 		Contract.ensures(group == p_group && group.findEntity(name) == this);
-		
+
 		if (group == p_group)
 			return;
-		
+
 		group = p_group;
 		group.registerEntity(this);
+
+		var childEntity:IEntity;
+		for (child in _children)
+		{
+			if (child.isEntity() && child.getUseByAgendaCount() > 0)
+			{
+				childEntity = cast child;
+				childEntity.addToGroup(group);
+			}
+		}
 	}
 
 	function removeFromGroup() : Void
 	{
 		Contract.ensures(group == null);
-		
-		group.unregisterEntity(this);
-		group = null;
+
+		if (group != null)
+		{
+			var childEntity:IEntity;
+			for (child in _children)
+			{
+				if (child.isEntity() && child.getUseByAgendaCount() > 0)
+				{
+					childEntity = cast child;
+					childEntity.removeFromGroup();
+				}
+			}
+			group.unregisterEntity(this);
+			group = null;
+		}
 	}
 
 	// ==============================================================================
@@ -399,7 +425,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	{
 		return _activeAgendas.copy();
 	}
-	
+
 	public function isAgendaActive(p_agenda:String):Bool
 	{
 		return _activeAgendas.indexOf(p_agenda) >= 0;
@@ -409,7 +435,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	{
 		Contract.requires(Agenda.validate(p_agenda));
 		Contract.ensures(getCurrentAgenda() == p_agenda && _activeAgendas.length == 2);
-		
+
 		hideAll();
 		show(p_agenda);
 		return this;
@@ -418,51 +444,69 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	public function show(p_agenda : String) : IAgendaManager
 	{
 		Contract.requires(Agenda.validate(p_agenda));
-		Contract.ensures(getCurrentAgenda() == p_agenda); 
-		
+		Contract.ensures(getCurrentAgenda() == p_agenda);
+
 		if (p_agenda == getCurrentAgenda())
 			return this;
-		
+
 		//TODO optimize
-			
+
 		var prevAgenda = getCurrentAgenda();
 		var newAgenda = p_agenda;
-		
+
 		//lost focus
-		for (child in _children)
+		if (_isAddedToRoot && _isActivated)
 		{
-			if (child.hasAgenda(prevAgenda) && !child.hasAgenda(newAgenda))
-				child.onLostFocus();
+			for (child in _children)
+			{
+				if (child.hasAgenda(prevAgenda) && !child.hasAgenda(newAgenda))
+					child.onLostFocus();
+			}
 		}
-		//
+
 		if (_activeAgendas.remove(newAgenda))
 		{
+			//this agend was already active
 			_activeAgendas.push(newAgenda);
-			for (child in _children)
-				if (child.hasAgenda(newAgenda))
-					child.onFocus();
+			if (_isAddedToRoot && _isActivated)
+				for (child in _children)
+					if (child.hasAgenda(newAgenda))
+						child.onFocus();
 		}
 		else
 		{
+			//agenda was not active
 			_activeAgendas.push(newAgenda);
-			var needFocus = [];
-			var needActivation = [];
-			for (child in _children)
+
+			if (_isAddedToRoot)
 			{
-				if (child.activateByAgenda(newAgenda))
+				var selected = [];
+				for (child in _children)
 				{
-					needFocus.push(child);
-					if (!child.isAddedToRoot())
+					if (child.activateByAgenda(newAgenda))
 					{
-						_addChildToRoot(child);
-						needActivation.push(child);
+						_addChildToHierarchy(child);
+						selected.push(child);
 					}
 				}
+				for (child in selected)
+					child.addToRoot();
+				if (_isActivated)
+				{
+					for (child in selected)
+						child.activate();
+
+					for (child in _children)
+						if (child.hasAgenda(newAgenda))
+							child.onFocus();
+				}
 			}
-			for (child in needActivation)
-				child.activate();
-			for (child in needFocus)
-				child.onFocus();
+			else
+			{
+				for (child in _children)
+					if (child.activateByAgenda(newAgenda))
+						_addChildToHierarchy(child);
+			}
 		}
 		return this;
 	}
@@ -472,39 +516,68 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		//TODO NEW
 		Contract.requires(p_agenda == null || Agenda.validate(p_agenda));
 		Contract.ensures(p_agenda != BaseAgenda.ALWAYS && getCurrentAgenda() != p_agenda);
-		
+
 		if (p_agenda == null)
 			p_agenda = getCurrentAgenda();
 		else if (_activeAgendas.indexOf(p_agenda) < 0)
 			return this;
-			
+
+		// you can't hide ALWAYS agenda
 		if (p_agenda != BaseAgenda.ALWAYS)
 		{
-			var isCurAgenda = p_agenda == getCurrentAgenda();
-			var selected:Array<IEntityChild> = [];
-			for (child in _children)
+			if (_isAddedToRoot)
 			{
-				if (isCurAgenda)
-					child.onLostFocus();
-					
-				if (child.deactivateByAgends(p_agenda))
-					selected.push(child);
+				var isFocusedAgenda = p_agenda == getCurrentAgenda();
+				var selected:Array<IEntityChild> = [];
+				if (_isActivated)
+				{
+					for (child in _children)
+					{
+						if (isFocusedAgenda && child.hasAgenda(p_agenda))
+							child.onLostFocus();
+
+						if (child.deactivateByAgends(p_agenda))
+							selected.push(child);
+					}
+					for (child in selected)
+						child.deactivate();
+
+					for (child in selected)
+						child.removeFromRoot();
+				}
+				else
+				{
+					for (child in _children)
+					{
+						if (child.deactivateByAgends(p_agenda))
+						{
+							child.removeFromRoot();
+							selected.push(child);
+						}
+					}
+				}
+
+				for (child in selected)
+					_removeChildFromHierarchy(child);
+
+				_activeAgendas.remove(p_agenda);
+
+				if (_isActivated && isFocusedAgenda)
+				{
+					var curAgenda = getCurrentAgenda();
+					//need to focus another agenda
+					for (child in _children)
+						if (child.hasAgenda(curAgenda))
+							child.onFocus();
+				}
 			}
-			
-			for (child in selected)
-				child.deactivate();
-			
-			for (child in selected)
-				_removeChildFromRoot(child);
-			
-			_activeAgendas.remove(p_agenda);
-			if (isCurAgenda)
+			else
 			{
-				var curAgenda = getCurrentAgenda();
-				//need to focus another agenda
 				for (child in _children)
-					if (child.hasAgenda(curAgenda))
-						child.onFocus();
+					if (child.deactivateByAgends(p_agenda))
+						_removeChildFromHierarchy(child);
+
+				_activeAgendas.remove(p_agenda);
 			}
 		}
 		return this;
@@ -517,86 +590,89 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	public function hideAll(?p_agenda : String):IAgendaManager
 	{
 		Contract.ensures(getCurrentAgenda() == BaseAgenda.ALWAYS);
-		if (p_agenda == null || p_agenda == BaseAgenda.ALWAYS || _activeAgendas.indexOf(p_agenda) < 0)
-		{
-			var curAgenda = getCurrentAgenda();
-			for (child in _children)
-				if (child.hasAgenda(curAgenda))
-					child.onLostFocus();
-			
-			var selected = [];
-			for (child in _children)
-			{
-				child.resetUseByAgendaCount();
 
-				if (child.isAddedToRoot())
+		var hasExceptAgenda = !(p_agenda == null || p_agenda == BaseAgenda.ALWAYS || _activeAgendas.indexOf(p_agenda) < 0);
+
+		if (_isAddedToRoot)
+		{
+			var selected = [];
+			if (_isActivated)
+			{
+				var curAgenda = getCurrentAgenda();
+				for (child in _children)
+					if (child.hasAgenda(curAgenda))
+						child.onLostFocus();
+
+				for (child in _children)
 				{
-					if (!child.hasAgenda(BaseAgenda.ALWAYS))
+					child.resetUseByAgendaCount();
+					child.activateByAgenda(BaseAgenda.ALWAYS);
+					if (hasExceptAgenda)
+						child.activateByAgenda(p_agenda);
+
+					if (child.getUseByAgendaCount() == 0)
 					{
-						if(child.isActivated())
-							child.deactivate();
+						if (child.isAddedToRoot())
+						{
+							if (child.isActivated())
+								child.deactivate();
+							selected.push(child);
+						}
+					}
+				}
+
+				for (child in selected)
+					child.removeFromRoot();
+			}
+			else
+			{
+				for (child in _children)
+				{
+					child.resetUseByAgendaCount();
+					child.activateByAgenda(BaseAgenda.ALWAYS);
+					if (hasExceptAgenda)
+						child.activateByAgenda(p_agenda);
+					if (child.getUseByAgendaCount() == 0)
+					{
+						if (child.isAddedToRoot())
+							child.removeFromRoot();
+
 						selected.push(child);
 					}
-					else
-						child.activateByAgenda(BaseAgenda.ALWAYS);
 				}
-				
 			}
+
 			for (child in selected)
-				_removeChildFromRoot(child);
-				
+				_removeChildFromHierarchy(child);
+
 			while (_activeAgendas.length > 1)
 				_activeAgendas.pop();
-			
+			if (hasExceptAgenda)
+				_activeAgendas.push(p_agenda);
+
 			for (child in _children)
-				if (child.hasAgenda(BaseAgenda.ALWAYS))
+				if (hasExceptAgenda && child.hasAgenda(p_agenda) || child.hasAgenda(BaseAgenda.ALWAYS))
 					child.onFocus();
 		}
 		else
 		{
-			var curAgenda = getCurrentAgenda();
-			var focusChanged = p_agenda != curAgenda;
-			if (focusChanged)
-				for (child in _children)
-					if (child.hasAgenda(curAgenda))
-						child.onLostFocus();
-					
-			var selected = [];
+			//Entity is not added to root, so only remove from hierarchy
 			for (child in _children)
 			{
-				if (child.isAddedToRoot())
+				if (child.getUseByAgendaCount() > 0)
 				{
 					child.resetUseByAgendaCount();
-					if(!child.hasAgenda(BaseAgenda.ALWAYS) && !child.hasAgenda(p_agenda))
-					{
-						if(child.isActivated())
-							child.deactivate();
-						selected.push(child);
-					}
-					else
-					{
-						child.activateByAgenda(BaseAgenda.ALWAYS);
+					child.activateByAgenda(BaseAgenda.ALWAYS);
+					if (hasExceptAgenda)
 						child.activateByAgenda(p_agenda);
-					}
+					if (child.getUseByAgendaCount() == 0)
+						_removeChildFromHierarchy(child);
 				}
 			}
-			
-			for (child in selected)
-				_removeChildFromRoot(child);
-			
-			while (_activeAgendas.length > 1)
-				_activeAgendas.pop();
-			_activeAgendas.push(p_agenda);
-			
-			if (focusChanged)
-				for (child in _children)
-					if (child.hasAgenda(p_agenda))
-						child.onFocus();
-			
 		}
 		return this;
 	}
-	
+
 	// ==============================================================================
 	// IPoolable
 	// ==============================================================================

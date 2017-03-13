@@ -57,15 +57,13 @@ abstract Path(String) from String to String
 		 * 3) reletive path by parents ie parent of the parent and so on
 		 *     @@@@@
 		 *     each @ meens up one target
-		 *     @ - parent of the current entity
-		 *     @@ - parent's parent 
+		 *     @ - current entity
+		 *     @@ - parent of the current entity
 		 *        and so on
 		 *        can specify child name, but not the path
 		 *     @@:some or @@@some - right
 		 *     @some.child  - WRONG
 		 * 	   . - group
-		 * 4) "" - current entity
-		 * 5) entityname or $componentname - search child by name
 		 *
 		 *
 		 * */

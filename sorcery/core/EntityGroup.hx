@@ -67,6 +67,11 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 		Contract.requires(p_entity != null, "Entity must not be null");
 		Contract.requires((_wrappedEntity.name == CoreNames.ROOT && p_entity == _wrappedEntity) || EntityName.validate(p_entity.name), "Invalid entity name");
 		
+		if (_entitiesByName.exists(p_entity.name))
+		{
+			core.error(Entity.DUPLICATED_CHILD_NAME_EXCEPTIOM);
+		}
+		
 		_entitiesByName[p_entity.name] = p_entity;
 	}
 
@@ -142,6 +147,7 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 	{
 		Contract.ensures(parentGroup == null);
 		
+		parentGroup.unregisterEntity(this);
 		parentGroup = null;
 	}
 
