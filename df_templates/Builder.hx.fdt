@@ -2,8 +2,6 @@ package $(Package);
 
 import sorcery.framework.builder.BuilderEvent;
 import sorcery.framework.builder.BuilderComponent;
-import sorcery.core.abstracts.Priority;
-import sorcery.core.interfaces.ICore;
 
 /**
 $(CBI)* ...
@@ -11,11 +9,8 @@ $(CBI)* @author $(DefaultUser)
 $(CBI)*/
 class $(FileName) extends BuilderComponent $(CSLB){
 
-	public function new(p_core:ICore, p_priority:Priority = 0) $(CSLB){
-		super(p_core, p_priority);
-    }
-	
 	override function onBuild(e:BuilderEvent):Void $(CSLB){
+		var entity = e.entity;
 		switch(e.entityId)
 		{
 			$(EntryPoint)

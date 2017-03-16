@@ -1,0 +1,37 @@
+package $(Package);
+
+import sorcery.core.interfaces.ICore;
+import sorcery.framework.screenManager.ScreenPart;
+
+/**
+$(CBI)* ...
+$(CBI)* @author $(DefaultUser)
+$(CBI)*/
+class $(FileName) extends ScreenPart $(CSLB){
+
+	public function new(p_core:ICore) 
+	{
+		super(p_core);
+		$(EntryPoint)
+	}
+	
+	override function onShow():Void 
+	{
+		
+	}
+	
+	override function onHide():Void 
+	{
+		
+	}
+	
+	override function onFocus():Void 
+	{
+		
+	}
+	
+	override function onLostFocus():Void 
+	{
+		
+	}
+}

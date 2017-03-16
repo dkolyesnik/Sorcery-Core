@@ -1,0 +1,24 @@
+package $(Package);
+import haxe.macro.Context;
+import haxe.macro.Expr;
+import haxe.macro.Expr.Access;
+import haxe.macro.Expr.Field;
+import haxe.macro.Expr.FieldType;
+/**
+$(CBI)* ...
+$(CBI)* @author $(DefaultUser)
+$(CBI)*/
+
+#if macro
+class $(FileName) 
+{
+	public static macro function build():Array<Field>
+	{
+		var fieldsArray = Context.getBuildFields();
+		
+		$(EntryPoint)
+		
+		return fieldsArray;
+	}
+}
+#end	
