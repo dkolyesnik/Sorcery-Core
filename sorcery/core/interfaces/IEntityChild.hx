@@ -15,8 +15,11 @@ interface IEntityChild extends IAgendaChild
 	function isEntity():Bool;
 	function isActivated():Bool;
 	function isAddedToRoot() : Bool;
+	
+	function asEntity():IEntity;
 
 	function setName(p_name : String) : IEntityChild;
+	function castTo<T>(cl:Class<T>):T;
 
 	function destroy() : Void;
 

@@ -67,6 +67,19 @@ class EntityChild implements IEntityChild implements HaxeContracts
 	{
 		return _isAddedToRoot;
 	}
+	
+	public function asEntity():IEntity
+	{
+		return null;
+	}
+	
+	public function castTo<T>(cl:Class<T>):T
+	{
+		if (Std.is(this, cl))
+			return cast this;
+		else	
+			return null;
+	}
 
 	public function setName(p_name:String):IEntityChild
 	{

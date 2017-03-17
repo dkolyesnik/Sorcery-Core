@@ -308,7 +308,12 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	{
 		return true;
 	}
-
+	
+	override public function asEntity():IEntity
+	{
+		return this;
+	}
+	
 	override function activate():Void
 	{
 		//TODO optimize

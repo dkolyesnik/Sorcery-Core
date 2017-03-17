@@ -99,6 +99,19 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 	{
 		return true;
 	}
+	
+	public function asEntity():IEntity
+	{
+		return this;
+	}
+	
+	public function castTo<T>(cl:Class<T>):T
+	{
+		if (Std.is(this, cl))
+			return cast this;
+		else
+			return null;
+	}
 
 	public function setName(p_name : String) : IEntityChild
 	{
