@@ -182,6 +182,7 @@ class Nullsafety
 		var stClassName = "";
 		if (topModuleType != null)
 		{
+			trace(topModuleType);
 			switch (topModuleType)
 			{
 				case ModuleType.TClassDecl(c):
