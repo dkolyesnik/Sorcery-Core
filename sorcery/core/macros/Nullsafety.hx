@@ -307,7 +307,7 @@ class Nullsafety
 			code += '\n if($prevVar != null) {';
 			code += '\n var $nextVar = ${prevVar}.${actions[i]};';
 			if (verboseNull)
-				closing = "\n } else {trace('"+prepareStr(actions[i])+" call returend null');}" + closing;
+				closing = "\n } else {trace('"+prepareStr(actions[i-1])+" call returend null');}" + closing;
 			else
 				closing = "\n }" + closing;
 			prevVar = nextVar;
@@ -322,7 +322,7 @@ class Nullsafety
 		else
 			code += "\n " + prevVar + "." + actions[i] + ";";
 		if (verboseNull)
-			closing = "\n } else {trace('"+prepareStr(actions[i])+" call returend null');}" + closing;
+			closing = "\n } else {trace('"+prepareStr(actions[i-1])+" call returend null');}" + closing;
 		else
 			closing = "\n }" + closing;
 
