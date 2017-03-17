@@ -1,4 +1,4 @@
-package sorcery.macros;
+package sorcery.core.macros;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;
