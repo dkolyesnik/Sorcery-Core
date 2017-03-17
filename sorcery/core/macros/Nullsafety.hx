@@ -182,7 +182,6 @@ class Nullsafety
 		var stClassName = "";
 		if (topModuleType != null)
 		{
-			trace(topModuleType);
 			switch (topModuleType)
 			{
 				case ModuleType.TClassDecl(c):
@@ -327,7 +326,6 @@ class Nullsafety
 		else
 			closing = "\n }" + closing;
 
-		//trace(code + closing);
 		return {start:code, end:closing, resVar:"_opt_0res", flagVar:"_opt_flag"};
 	}
 	static function prepareStr(str:String):String
