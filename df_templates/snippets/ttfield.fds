@@ -1,5 +1,5 @@
 {
-	name:$(EntryPoint),
+	name:'$(EntryPoint)',
 	access:[Access.],
 	kind:FieldType. ,
 	pos:Context.currentPos(),

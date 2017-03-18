@@ -1,5 +1,6 @@
 {
 	args:[$(EntryPoint)],
 	ret:macro:Void,
-	expr: null
+	expr: null,
+	params:[]
 }

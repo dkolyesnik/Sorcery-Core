@@ -1,0 +1,2 @@
+public var $(name)(null, set): $(TypKind);
+public function set_$(name)(value:$TypeKind):$(TypKind){ return $(name) = value; }

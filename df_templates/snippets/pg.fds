@@ -1,0 +1,2 @@
+public var $(name)(get, null): $(TypKind);
+public function get_$(name)():$(TypKind){ return $(name); }
