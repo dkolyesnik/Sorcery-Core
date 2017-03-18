@@ -107,48 +107,22 @@ class Nullsafety
 		return Context.parse(code, value.pos);
 	}
 
-	//TODO remove unused cases
 	static function findTopExpr(expr:TypedExpr):ModuleType
 	{
 		switch (expr.expr)
 		{
-			case TypedExprDef.TConst(c):
-				log('TConst');
-			case TypedExprDef.TLocal(v):
-				log('TLocal ${v.name}');
 			case TypedExprDef.TArray(a, e):
 				log('TArray');
 				return findTopExpr(a);
-			case TypedExprDef.TBinop(op, e1, e2):
-				log('TBinop');
 			case TypedExprDef.TField(e, fa):
 				log('TField');
 				return findTopExpr(e);
 			case TypedExprDef.TTypeExpr(m):
 				log('TTypeExpr');
 				return m;
-			case TypedExprDef.TParenthesis(e):
-				log('TParenthesis');
-			case TypedExprDef.TObjectDecl(fields):
-				log('TObjectDecl');
-			case TypedExprDef.TArrayDecl(el):
-				log('TArrayDecl');
 			case TypedExprDef.TCall(e, el):
 				log('TCall');
 				return findTopExpr(e);
-			case TypedExprDef.TNew(c, p, el):
-				log('TNew');
-			case TypedExprDef.TUnop(op, p, e):
-				log('TUnop');
-			case TypedExprDef.TFunction(f):
-				log('TFunction');
-			case TypedExprDef.TVar(v, e):
-				log('TVar');
-			case TypedExprDef.TBlock(el):
-				log('TBlock');
-			case TypedExprDef.TCast(e, m):
-				log('TCast');
-
 			default:
 		}
 		return null;
@@ -330,21 +304,13 @@ class Nullsafety
 	}
 	static function prepareStr(str:String):String
 	{
-		var parts = str.split("'");
-		function combine()
-		{
-			str = "";
-			for (p in parts)
-				str += p;
+		var res = "";
+		for (i in 0...str.length) {
+			var c = str.charAt(i);
+			if (c != "'" && c != '"' && c != "$" && c != '\\')
+				res += c;
 		}
-		combine();
-		parts = str.split('"');
-		combine();
-		parts = str.split("$");
-		combine();
-		parts = str.split('\\');
-		combine();
-		return str;
+		return res;
 	}
 	#end
 }
