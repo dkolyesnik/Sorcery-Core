@@ -29,8 +29,10 @@ class Nullsafety
 	 * @param	defaultValue  - default expression
 	 * @param	verboseNull - if true adds else branches that trace the name of the call that returned null
 	 */
-	macro public static function safeGet(value:Expr, defaultValue:Expr, verboseNull:Bool = false)
+	macro public static function safeGet(value:Expr, defaultValue:Expr = null, verboseNull:Bool = false)
 	{
+		if (defaultValue == null)
+			defaultValue = macro null;
 		var type = Context.typeExpr(defaultValue).t;
 		var actions = getStringActions(value);
 		var defaultValueCode = ExprTools.toString(defaultValue);
