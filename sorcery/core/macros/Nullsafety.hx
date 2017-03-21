@@ -388,40 +388,6 @@ class Nullsafety
 
 		return value;
 
-		//trash
-		//var t = Context.typeExpr(nextExpr).t;
-		//switch (t)
-		//{
-		//case Type.TAbstract(_.get() => {name:"Int"}, _)
-		//|TAbstract(_.get() => {name:"Float"}, _)
-		//|TAbstract(_.get() => {name:"Bool"}, _)
-		//|TAbstract(_.get() => {name:"Void"}, _):
-//
-		////if isSafeCall
-//
-		////if !isSafeCall - safeGet
-		///*
-		//var _res = defaultTypeVal;
-		//if(expr != null){
-		//expr();
-		//_flag = true;
-		//}
-		//*/
-		//default:
-		////is nullable
-		////if isSafeCall
-		///*
-		//var _flag = false;
-		//if(expr != null) {
-		//var _0 = expr();
-		//if(_0 != null)
-		//_flah = true;
-		//}
-		//_flag;
-		//*/
-		//return macro $expr != null;
-//
-		//}
 	}
 	
 	macro public static function safeCall2(value:Expr, verboseNull:Bool = false)
@@ -430,7 +396,7 @@ class Nullsafety
 		trace(value);
 		trace("--------------------------------");
 		
-		var exprArray = [];
+		var exprArray = [value];
 		switch (value.expr)
 		{
 			case EArray(e, _) | EField(e,_) | ECall(e,_):
@@ -453,7 +419,7 @@ class Nullsafety
 		{
 			var exAr = [];
 			var newVar = createVarName();
-			exAr.push(macro $i{newVar} = $exprCall);
+			exAr.push(macro var $newVar = $exprCall);
 			
 			var eif = new IfData();
 			eif.econd = macro $i{newVar} != null;
@@ -464,10 +430,11 @@ class Nullsafety
 		
 		createFinalIfBody = function(exprCall:Expr)
 		{
-			var exAr = [];
-			exAr.push(exprCall);
-			exAr.push(macro $i{_flagName} = true);
-			return macro $b{exAr};
+			//var exAr = [];
+			//exAr.push(exprCall);
+			//exAr.push(macro $i{_flagName} = true);
+			//return macro $b{exAr};
+			return macro { $exprCall; $i{_flagName} = true;}; 
 		};
 		
 		parseExpr = function(expr:Expr, prevVar:String)
