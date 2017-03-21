@@ -19,7 +19,7 @@ class Nullsafety
 	#if macro
 	static function log(msg:Dynamic)
 	{
-		trace(msg);
+		//trace(msg);
 	}
 	#end
 
@@ -158,7 +158,7 @@ class Nullsafety
 							case ECall(e, p):
 								//if there is a call after field, do not check fiels alone
 								exprArray.pop();
-								var callExpr = {expr:ECall(macro $i{prevVar} .$f, p), pos:expr.pos};
+								var callExpr = {expr:ECall(macro $i{prevVar}.$f, p), pos:expr.pos};
 								if (exprArray.length > 0)
 									return createNextTempVarAndIf(callExpr);
 								else
