@@ -21,35 +21,10 @@ class Nullsafety
 		//trace(msg);
 	}
 
-	//TODO cleanup the code
 	static var _varPref = "_s_";
 	static var _flagName = _varPref + "flag";
 	static var _resName = _varPref + "res";
 
-	#if macro
-	public static function unwrapExpr(expr:Expr, ar:Array<Expr>)
-	{
-		ar.push(expr);
-		switch (expr.expr)
-		{
-			case ExprDef.EField(e, f):
-				trace("EField");
-				unwrapExpr(e, ar);
-			case ExprDef.EArray(e1, e2):
-				trace("EArray");
-				unwrapExpr(e1, ar);
-			case ExprDef.ECall(e, p):
-				trace("ECall");
-				unwrapExpr(e, ar);
-			case ExprDef.EConst(c):
-				trace("EConst");
-			case ExprDef.EParenthesis(e):
-				trace("EParenthesis");
-			default:
-				throw "Error: this type of expression is not supported";
-		}
-	}
-	#end
 	/**
 	 * safeCall(expr)  => returns series of if checks and bool value, false if some check returned null
 	 * safeCall((expr)) | safeCall(ident)-> if expr type is Void or not nullable, returns expr, if type is nullable return expr != null
@@ -59,354 +34,36 @@ class Nullsafety
 	 * safeCall(id["dsaf"].field.call) - >
 	 */
 
-	macro public static function dd(value:Expr, defaultValue:Expr = null)
+	/**
+	 * nullsafe chained calls
+	 * return true if last expression is executed, false otherwise
+	 * return value of the last expression is not checked, it can be any type
+	 * generate a number of (if != null) checks and local variables
+	 * no anonymous objects, functions and so on, strictly typed
+	 * wrapping part of the chain in parentheses will make it the fist check condition
+	 * i.e. safeCall((a.b.c).d) will generate one check if(a.b.c != null)
+	 * @param	value  -  call chain
+	 */
+	macro public static function safeCall(value:Expr)
 	{
-		trace(Context.typeExpr(value).t);
-		trace("--------------------------------");
-		//TODO setup
-		var defaultResValue = null;
-		var isSafeCall = true;
-		var needFlag = isSafeCall;
-		var needResultVar = false;
-		var type = Context.typeExpr(value).t;
-		//-
-		//IDEA - задать переменные к-е определяют действия в первом свиче, а затем вызывать парсинг,
-		//переменные внешние и потому не надо будет передавать
+		log(value.toString());
+		log("--------------------------------");
 		
+		if (ExprTools.toString(value) == "@:this this")
+			throw "Do not use this as static extension, une import instead";
+			
 		var exprArray = [];
 		switch (value.expr)
 		{
-			case ExprDef.EBinop(op, e1, e2):
-				trace("EBinop");
-				defaultResValue = getTypeDefaultValueExpr(Context.typeExpr(e2).t);
-				unwrapExpr(e2, exprArray);
-			//TODO
-			case ExprDef.EUnop(op, p, e):
-				trace("EUnop");
-
-				defaultResValue = getTypeDefaultValueExpr(Context.typeExpr(e).t);
-				unwrapExpr(e, exprArray);
-			//TODO
-			case ExprDef.EVars(va):
-				throw "Error: declare var outside before using it";
-			default:
-				defaultResValue = getTypeDefaultValueExpr(Context.typeExpr(value).t);
-				unwrapExpr(value, exprArray);
-		}
-		exprArray.length > 0? exprArray.reverse():throw "Error: np expr";
-
-		var index = 0;
-		
-		var createVarName:Void->String;
-		var createInitialExpr:Expr->Expr;
-		var parseExpr:String->Expr;
-		var varCounter = 0;
-		createVarName = function() return _varPref + Std.string(++varCounter);
-		
-		createInitialExpr = function (callExpr:Expr)
-		{
-			var tAr = [];
-			if (needFlag)
-				tAr.push(macro var $_flagName = false);
-			if (needResultVar)
-				tAr.push(macro var $_resName = defaultResValue);
-				
-			var newVar = createVarName();
-			tAr.push(macro var $newVar = $callExpr);
-			var ife = new IfData();
-			ife.econd = macro $i{newVar} != null;
-			var eifAr = [];
-			//if there are more expressions ahead
-			if (++index < exprArray.length)
-			{
-				
-				eifAr.push(parseExpr(newVar));
-				if (isSafeCall)
-				{
-					
-				}
-				else
-				{
-					
-				}
-			}
-			else
-			{
-				if (needResultVar)
-					eifAr.push(macro $i{_resName} = $callExpr);
-				else
-					eifAr.push(macro $callExpr);
-				if (needFlag)
-					eifAr.push(macro $i{_flagName} = true);
-				
-				if (!isSafeCall)
-				{
-					if (needResultVar)
-						if(defaultValue != null)
-							ife.eelse = macro $i{_resName} = defaultValue;
-					else
-						ife.eelse = defaultValue == null ? defaultResValue : defaultValue;
-				}
-				ife.eif = macro $b{eifAr};
-				tAr.push(ife.toExpr(callExpr.pos));
-			}
-			
-			return macro $b{tAr};
-		}
-		parseExpr = function(prevVar:String = null):Expr
-		{
-			trace(index, prevVar);
-			var expr = exprArray[index];
-			switch (expr.expr)
-			{
-				case ExprDef.EField(e, f):
-					trace("_EField");
-					var nextExpr = index < exprArray.length - 1 ? exprArray[index + 1] : null;
-					if (nextExpr != null)
-					{
-						switch (nextExpr.expr)
-						{
-							case ECall(e, p):
-
-							default:
-						}
-					}
-				case ExprDef.EArray(e1, e2):
-				//TODO
-				case ExprDef.EConst(CIdent(s)):
-					trace("_EConst-CIdent");
-					var nextExpr = index + 1 < exprArray.length ? exprArray[index + 1] : null;
-					if (nextExpr == null)
-					{
-						if (isSafeCall)
-							return macro $b {[expr, macro true]};
-						else
-							return expr;
-					}
-					else
-					{
-						if (isIdentifierAThisOrTypeExpr(expr))
-						{
-							index++;
-							switch(nextExpr.expr)
-							{
-								case EField(e, f):
-									if (index + 1 < exprArray.length)
-									{
-										var nextNextExpr = exprArray[index + 1];
-										switch(nextNextExpr.expr)
-										{
-											case ECall(e, p):
-												index++;
-										return createInitialExpr({expr:ECall(macro $i{s}.$f, p), pos:e.pos});
-											default:
-												createInitialExpr(macro $i{s}.$f);
-										}
-									}
-									else
-									{
-										//call fiedl
-									}
-								default:
-									throw "Error";
-							}
-						}
-						else
-						{
-							switch(nextExpr.expr)
-								{
-									case ECall(e, p):
-										return createInitialExpr(macro $i{s}());
-										/*
-										var _0 = iden();
-										if(_0 != null)
-										{
-										
-										}
-										*/
-									default:
-										//create temp var and go on
-								}
-						}
-					}
-				case ExprDef.EParenthesis(e):
-					trace("_EParenthesis");
-					var nextExpr = index < exprArray.length - 1 ? exprArray[index + 1] : null;
-					if (nextExpr == null)
-					{
-						if (isSafeCall)
-							return macro $b {[expr, macro true]};
-						else
-							return expr;
-					}
-					else
-					{
-						switch (nextExpr.expr)
-						{
-							case ECall(e, p):
-								//if (isSafeCall)
-								//{
-									///*
-									//var _flag = false;
-									//if(expr != null){
-										//expr();
-										//_flag = true;
-									//}
-									//_flag;
-									//*/
-									//var tempAr = [];
-									//tempAr.push(macro var $_flagName = false);
-//
-									//var ifExpr = new IfData();
-									//ifExpr.econd = macro $expr != null;
-									//ifExpr.eif = macro $b {[macro $ {expr}(), macro $i {_flagName} = true]};
-									//tempAr.push(ifExpr.toExpr(expr.pos));
-//
-									//tempAr.push(macro $i {_flagName});
-//
-									//return macro $b {tempAr};
-								//}
-								//else
-								//{
-									////safeGet
-									///*
-									//if(expr != null)
-										//expr();
-									//else
-										//defaultValue;
-									//*/
-									//var ifExpr = new IfData();
-									//ifExpr.econd = macro $expr != null;
-									//ifExpr.eif = macro $ {expr}();
-									//ifExpr.eelse = defaultValue == null ? defaultResValue : defaultValue;
-//
-									//return ifExpr.toExpr(expr.pos);
-								//}
-							default:
-								//create new temp var and if() and go on
-								//if (isSafeCall)
-								//{
-									///*
-									//var _flag = false;
-									//var _0 = expr;
-									//if(_0 != null)
-									//{
-										//<= parseCode
-									//}
-									//_flag;
-									 //*/
-									//var tempAr = [];
-									//var newVar = createVarName();
-									//tempAr.push(macro var $_flagName = false);
-									//tempAr.push(macro var $newVar = $defaultValue);
-//
-									//var ife = new IfData();
-									//ife.econd = macro $i {newVar} != null;
-									//index++;
-									//ife.eif = parseExpr(newVar);
-									//tempAr.push(ife.toExpr(expr.pos));
-//
-									//tempAr.push(macro $i {_flagName});
-//
-									//return macro $b {tempAr};
-								//}
-								//else
-								//{
-									////safeGet
-									//if (defaultValue == null)
-									//{
-										///*
-										//var _res = defaultTypeValue;
-										//var _0 = expr;
-										//if(_0 != null)
-										//{
-										//<= parseCode
-										//}
-										//_res;
-										//*/
-										//var tempAr = [];
-										//tempAr.push(macro var $_resName = $defaultResValue);
-										//var newVar = createVarName();
-										//tempAr.push(macro var $newVar = $defaultValue);
-										//var ife = new IfData();
-										//ife.econd = macro $i {newVar} != null;
-										//ife.eif = parseExpr(++index, newVar);
-										//tempAr.push(ife.toExpr(expr.pos));
-										//tempAr.push(macro $i {_resName});
-										//return macro $b {tempAr};
-									//}
-									//else
-									//{
-										///*
-										//var _flag = false;
-										//var _res = defaultTypeValue;
-										//var _0 = expr;
-										//if(_0 != null)
-										//{
-										//<= parseCode
-										//}
-										//if(!_flag)
-											//_res = defaultValue;
-										//_res;
-										//*/
-										//var tempAr = [];
-										//tempAr.push(macro var $_flagName = false);
-										//tempAr.push(macro var $_resName = $defaultResValue);
-										//var newVar = createVarName();
-										//tempAr.push(macro var $newVar = $defaultValue);
-										//var ife = new IfData();
-										//ife.econd = macro $i {newVar} != null;
-										//ife.eif = parseExpr(++index, newVar);
-										//tempAr.push(ife.toExpr(expr.pos));
-										//ife = new IfData();
-										//ife.econd = macro !$i {_flagName};
-										//ife.eif = macro $i {_resName} = $defaultValue;
-										//tempAr.push(ife.toExpr(expr.pos));
-										//tempAr.push(macro $i {_resName});
-										//return macro $b {tempAr};
-									//}
-								//}
-						}
-					}
-
-				//if (index < exprArray.length-1)
-				//{//if there are more expr ahead
-				////create null check
-				//var ifExpr = {econd:null, eif:null, eelse:null};
-				//ifExpr.econd = macro $i{newVar} != null;
-				//ifExpr.eif = parseExpr(++index, newVar);
-				//tempAr.push({expr:EIf(ifExpr.econd, ifExpr.eif, ifExpr.eelse), pos:value.pos });
-				//}
-				//return macro $b {tempAr};
-				default:
-			}
-			return null;
-		}
-
-		
-		var result = parseExpr(null);
-
-		return value;
-
-	}
-	
-	macro public static function safeCall2(value:Expr, verboseNull:Bool = false)
-	{
-		trace(Context.typeExpr(value).t);
-		trace(value);
-		trace("--------------------------------");
-		
-		var exprArray = [value];
-		switch (value.expr)
-		{
-			case EArray(e, _) | EField(e,_) | ECall(e,_):
+			case EArray(e, _) | EField(e, _) | ECall(e, _):
+				exprArray.push(value);
 				unwrapExpr(e, exprArray);
 			default:
 				throw "Error: wrong expression";
-				
+
 		}
 		if (exprArray.length == 0)
-			throw "Error: need more expr";
+			throw "Error: need more expressions";
 
 		var createVarName:Void->String;
 		var parseExpr:Expr->String->Expr;
@@ -414,55 +71,50 @@ class Nullsafety
 		var createFinalIfBody:Expr->Expr;
 		var varCounter = 0;
 		createVarName = function() return _varPref + Std.string(++varCounter);
-		
+
 		createNextTempVarAndIf = function(exprCall:Expr)
 		{
-			var exAr = [];
 			var newVar = createVarName();
-			exAr.push(macro var $newVar = $exprCall);
-			
-			var eif = new IfData();
-			eif.econd = macro $i{newVar} != null;
-			eif.eif = parseExpr(exprArray.pop(), newVar);
-			exAr.push(eif.toExpr(exprCall.pos));
-			return macro $b{exAr};
+			return macro
+			{
+				var $newVar = $exprCall;
+				if ($i{newVar} != null)
+				{
+					$ {parseExpr(exprArray.pop(), newVar)};
+				}
+			};
 		};
-		
+
 		createFinalIfBody = function(exprCall:Expr)
 		{
-			//var exAr = [];
-			//exAr.push(exprCall);
-			//exAr.push(macro $i{_flagName} = true);
-			//return macro $b{exAr};
-			return macro { $exprCall; $i{_flagName} = true;}; 
+			return macro { $exprCall; $i{_flagName} = true;};
 		};
-		
+
 		parseExpr = function(expr:Expr, prevVar:String)
 		{
-			trace(expr, prevVar);
 			switch (expr.expr)
 			{
 				case EField(e, f):
-					trace("_EField");
 					if (exprArray.length > 0)
 					{
 						var nextExpr = exprArray[exprArray.length - 1];
 						switch (nextExpr.expr)
 						{
 							case ECall(e, p):
+								//if there is a call after field, do not check fiels alone
 								exprArray.pop();
-								var callExpr = {expr:ECall(macro $i{prevVar}.$f, p), pos:expr.pos};
+								var callExpr = {expr:ECall(macro $i{prevVar} .$f, p), pos:expr.pos};
 								if (exprArray.length > 0)
 									return createNextTempVarAndIf(callExpr);
 								else
-									return createFinalIfBody(callExpr); 
+									return createFinalIfBody(callExpr);
 							default:
-								return createNextTempVarAndIf(macro $i{prevVar}.$f);
-								
+								return createNextTempVarAndIf(macro $i {prevVar} .$f);
+
 						}
 					}
 					else
-						return createFinalIfBody(macro $i{prevVar}.$f);
+						return createFinalIfBody(macro $i {prevVar} .$f);
 				case ECall(e, p):
 					//possible only after parentses or other call or array
 					var callExpr = {expr:ECall(macro $i{prevVar}, p), pos:e.pos};
@@ -471,92 +123,448 @@ class Nullsafety
 					else
 						return createFinalIfBody(callExpr);
 				case EArray(e1, e2):
-					var callExpr = macro $i{prevVar}[$e2];
+					var callExpr = macro $i {prevVar} [$e2];
 					if (exprArray.length > 0)
 						return createNextTempVarAndIf(callExpr);
 					else
 						return createFinalIfBody(callExpr);
 				default:
-					throw "Error 507";
+					throw "Error";
 			}
 		};
 		var firstExpr = exprArray.pop();
 		var firstCheckedExpr;
-		switch(firstExpr.expr)
+		switch (firstExpr.expr)
 		{
 			case EField(e, f):
-				firstCheckedExpr = macro $i{f};
+				firstCheckedExpr = macro $i {f};
 			case EParenthesis(e):
-				trace("_EParenthesis");
 				firstCheckedExpr = e;
 			case EConst(CIdent(s)):
-				trace("_EConst-CIdent");
 				if (isIdentifierAThisOrTypeExpr(firstExpr))
 				{
 					if (exprArray.length > 0)
 					{
 						var nextExpr = exprArray.pop();
-						switch(nextExpr.expr)
+						switch (nextExpr.expr)
 						{
 							case EField(e, f):
 								if (exprArray.length > 0)
 								{
 									var nextNextExpr = exprArray[exprArray.length-1];
-									switch(nextNextExpr.expr)
+									switch (nextNextExpr.expr)
 									{
 										case ECall(ec, p):
 											exprArray.pop();
-											firstCheckedExpr = {expr:ECall(macro $i{s}.$f, p), pos:ec.pos};
+											firstCheckedExpr = {expr:ECall(macro $i{s} .$f, p), pos:ec.pos};
 										default:
-											firstCheckedExpr = macro $i{s}.$f;
+											firstCheckedExpr = macro $i {s} .$f;
 									}
 								}
 								else
 								{
-									firstCheckedExpr = macro $i{s}.$f;
+									firstCheckedExpr = macro $i {s} .$f;
 								}
 							default:
-								throw "Error 547";
+								throw "Error";
 						}
 					}
-					else 
+					else
 					{
-						throw "Error 552";
+						throw "Error";
 					}
 				}
 				else
 				{
-					firstCheckedExpr = macro $i{s};
+					firstCheckedExpr = macro $i {s};
 				}
 			default:
-				throw "Error 560";
+				throw "Error";
 		}
 		if (exprArray.length == 0)
+			return macro {$firstCheckedExpr; true; };
+
+
+		return macro
 		{
-			return macro $b{[macro $firstCheckedExpr, macro true]};
-		}
-		
-		var tAr = [];
-		tAr.push(macro var $_flagName = false);
-
-		var newVar = createVarName();
-		tAr.push(macro var $newVar = $firstCheckedExpr);
-		
-		var ife = new IfData();
-		ife.econd = macro $i{newVar} != null;
-		ife.eif = parseExpr(exprArray.pop(), newVar);
-		tAr.push(ife.toExpr(value.pos));
-		
-		tAr.push(macro $i{_flagName});
-
-		return macro $b{tAr};
+			var $_flagName = false;
+			${createNextTempVarAndIf(firstCheckedExpr)};
+			$i{_flagName};
+		};
 	}
 	
+	macro public static function do_safe(value:Expr, callType:CallType )
+	{
+		log(value.toString());
+		log("--------------------------------");
+		
+		if (ExprTools.toString(value) == "@:this this")
+			throw "Do not use this as static extension, une import instead";
+			
+		var exprArray = [];
+		switch (value.expr)
+		{
+			case EArray(e, _) | EField(e, _) | ECall(e, _):
+				exprArray.push(value);
+				unwrapExpr(e, exprArray);
+			default:
+				throw "Error: wrong expression";
+
+		}
+		if (exprArray.length == 0)
+			throw "Error: need more expressions";
+
+		var createVarName:Void->String;
+		var parseExpr:Expr->String->Expr;
+		var createNextTempVarAndIf:Expr->Expr;
+		var createFinalIfBody:Expr->Expr;
+		var varCounter = 0;
+		createVarName = function() return _varPref + Std.string(++varCounter);
+
+		createNextTempVarAndIf = function(exprCall:Expr)
+		{
+			var newVar = createVarName();
+			return macro
+			{
+				var $newVar = $exprCall;
+				if ($i{newVar} != null)
+				{
+					$ {parseExpr(exprArray.pop(), newVar)};
+				}
+			};
+		};
+
+		createFinalIfBody = function(exprCall:Expr)
+		{
+			switch(callType)
+			{
+				case SafeCall:
+					return macro { $exprCall; $i{_flagName} = true;};
+				case SafeGet(d):
+				return macro { $i{_resName} = $exprCall
+			}
+			
+		};
+
+		parseExpr = function(expr:Expr, prevVar:String)
+		{
+			switch (expr.expr)
+			{
+				case EField(e, f):
+					if (exprArray.length > 0)
+					{
+						var nextExpr = exprArray[exprArray.length - 1];
+						switch (nextExpr.expr)
+						{
+							case ECall(e, p):
+								//if there is a call after field, do not check fiels alone
+								exprArray.pop();
+								var callExpr = {expr:ECall(macro $i{prevVar} .$f, p), pos:expr.pos};
+								if (exprArray.length > 0)
+									return createNextTempVarAndIf(callExpr);
+								else
+									return createFinalIfBody(callExpr);
+							default:
+								return createNextTempVarAndIf(macro $i {prevVar} .$f);
+
+						}
+					}
+					else
+						return createFinalIfBody(macro $i {prevVar} .$f);
+				case ECall(e, p):
+					//possible only after parentses or other call or array
+					var callExpr = {expr:ECall(macro $i{prevVar}, p), pos:e.pos};
+					if (exprArray.length > 0)
+						return createNextTempVarAndIf(callExpr);
+					else
+						return createFinalIfBody(callExpr);
+				case EArray(e1, e2):
+					var callExpr = macro $i {prevVar} [$e2];
+					if (exprArray.length > 0)
+						return createNextTempVarAndIf(callExpr);
+					else
+						return createFinalIfBody(callExpr);
+				default:
+					throw "Error";
+			}
+		};
+		var firstExpr = exprArray.pop();
+		var firstCheckedExpr;
+		switch (firstExpr.expr)
+		{
+			case EField(e, f):
+				firstCheckedExpr = macro $i {f};
+			case EParenthesis(e):
+				firstCheckedExpr = e;
+			case EConst(CIdent(s)):
+				if (isIdentifierAThisOrTypeExpr(firstExpr))
+				{
+					if (exprArray.length > 0)
+					{
+						var nextExpr = exprArray.pop();
+						switch (nextExpr.expr)
+						{
+							case EField(e, f):
+								if (exprArray.length > 0)
+								{
+									var nextNextExpr = exprArray[exprArray.length-1];
+									switch (nextNextExpr.expr)
+									{
+										case ECall(ec, p):
+											exprArray.pop();
+											firstCheckedExpr = {expr:ECall(macro $i{s} .$f, p), pos:ec.pos};
+										default:
+											firstCheckedExpr = macro $i {s} .$f;
+									}
+								}
+								else
+								{
+									firstCheckedExpr = macro $i {s} .$f;
+								}
+							default:
+								throw "Error";
+						}
+					}
+					else
+					{
+						throw "Error";
+					}
+				}
+				else
+				{
+					firstCheckedExpr = macro $i {s};
+				}
+			default:
+				throw "Error";
+		}
+		if (exprArray.length == 0)
+			return macro {$firstCheckedExpr; true; };
+
+
+		return macro
+		{
+			var $_flagName = false;
+			${createNextTempVarAndIf(firstCheckedExpr)};
+			$i{_flagName};
+		};
+	}
+	
+	
+	/*
+	var name = safeGet2((core.root).getChilf().getPos(), new Point());
+	var name;
+	var _0 = core.root;
+	var _fl = false;
+	var _res = defTypeVal;
+	if(_0 != null){
+		var _1 = _0.getChilf();
+		if(_1 != null){
+			_res = _1.getPos();
+			_fl = true;
+		}
+	}
+	if(!_fl)
+		_res = defExpr;
+	_res;
+
+	if(safeGet2(core.root.isAdded(), false))
+
+	*/
+	macro public static function safeGet2(value:Expr, defaultExpr:Expr = null)
+	{
+		log(value.toString());
+		log("--------------------------------");
+
+		//decide what type are we waiting
+		var valueType = Context.typeExpr(value).t;
+		trace("valueType ", valueType);
+		switch (valueType)
+		{
+			case TAbstract(_.get() => {name:"Void"}, _):
+				throw "Error: expression return must not be Void";
+			default:
+		}
+
+		var expectedType = Context.getExpectedType();
+		trace("Expected Type ", expectedType);
+		if (expectedType != null)
+		{
+			switch (expectedType)
+			{
+				case TMono(_):
+					expectedType = null;
+				default:
+			}
+		}
+
+		var defaultExprType = defaultExpr == null ? null : Context.typeExpr(defaultExpr).t;
+		trace("defaultExprType ", defaultExprType);
+
+		//-
+		var exprArray = [];
+		switch (value.expr)
+		{
+			case EArray(e, _) | EField(e, _) | ECall(e, _):
+				exprArray.push(value);
+				unwrapExpr(e, exprArray);
+			default:
+				throw "Error: wrong expression";
+
+		}
+		if (exprArray.length == 0)
+			throw "Error: need more expressions";
+
+		var createVarName:Void->String;
+		var parseExpr:Expr->String->Expr;
+		var createNextTempVarAndIf:Expr->Expr;
+		var createFinalIfBody:Expr->Expr;
+		var varCounter = 0;
+		createVarName = function() return _varPref + Std.string(++varCounter);
+
+		createNextTempVarAndIf = function(exprCall:Expr)
+		{
+			var newVar = createVarName();
+			return macro
+			{
+				var $newVar = $exprCall;
+				if ($i{newVar} != null)
+				{
+					$ {parseExpr(exprArray.pop(), newVar)};
+				}
+			};
+		};
+
+		createFinalIfBody = function(exprCall:Expr)
+		{
+			return macro { $exprCall; $i{_flagName} = true;};
+		};
+
+		parseExpr = function(expr:Expr, prevVar:String)
+		{
+			switch (expr.expr)
+			{
+				case EField(e, f):
+					if (exprArray.length > 0)
+					{
+						var nextExpr = exprArray[exprArray.length - 1];
+						switch (nextExpr.expr)
+						{
+							case ECall(e, p):
+								//if there is a call after field, do not check fiels alone
+								exprArray.pop();
+								var callExpr = {expr:ECall(macro $i{prevVar} .$f, p), pos:expr.pos};
+								if (exprArray.length > 0)
+									return createNextTempVarAndIf(callExpr);
+								else
+									return createFinalIfBody(callExpr);
+							default:
+								return createNextTempVarAndIf(macro $i {prevVar} .$f);
+
+						}
+					}
+					else
+						return createFinalIfBody(macro $i {prevVar} .$f);
+				case ECall(e, p):
+					//possible only after parentses or other call or array
+					var callExpr = {expr:ECall(macro $i{prevVar}, p), pos:e.pos};
+					if (exprArray.length > 0)
+						return createNextTempVarAndIf(callExpr);
+					else
+						return createFinalIfBody(callExpr);
+				case EArray(e1, e2):
+					var callExpr = macro $i {prevVar} [$e2];
+					if (exprArray.length > 0)
+						return createNextTempVarAndIf(callExpr);
+					else
+						return createFinalIfBody(callExpr);
+				default:
+					throw "Error";
+			}
+		};
+		var firstExpr = exprArray.pop();
+		var firstCheckedExpr;
+		switch (firstExpr.expr)
+		{
+			case EField(e, f):
+				firstCheckedExpr = macro $i {f};
+			case EParenthesis(e):
+				firstCheckedExpr = e;
+			case EConst(CIdent(s)):
+				if (isIdentifierAThisOrTypeExpr(firstExpr))
+				{
+					if (exprArray.length > 0)
+					{
+						var nextExpr = exprArray.pop();
+						switch (nextExpr.expr)
+						{
+							case EField(e, f):
+								if (exprArray.length > 0)
+								{
+									var nextNextExpr = exprArray[exprArray.length-1];
+									switch (nextNextExpr.expr)
+									{
+										case ECall(ec, p):
+											exprArray.pop();
+											firstCheckedExpr = {expr:ECall(macro $i{s} .$f, p), pos:ec.pos};
+										default:
+											firstCheckedExpr = macro $i {s} .$f;
+									}
+								}
+								else
+								{
+									firstCheckedExpr = macro $i {s} .$f;
+								}
+							default:
+								throw "Error";
+						}
+					}
+					else
+					{
+						throw "Error";
+					}
+				}
+				else
+				{
+					firstCheckedExpr = macro $i {s};
+				}
+			default:
+				throw "Error";
+		}
+		if (exprArray.length == 0)
+			return macro {$firstCheckedExpr; true; };
+
+		var newVar = createVarName();
+
+		return macro
+		{
+			var $_flagName = false;
+			var $newVar = $firstCheckedExpr;
+			if ($i{newVar} != null)
+			{
+				$ {parseExpr(exprArray.pop(), newVar)};
+			}
+			$i{_flagName};
+		};
+	}
+
 	#if macro
+	public static function unwrapExpr(expr:Expr, ar:Array<Expr>)
+	{
+		ar.push(expr);
+		switch (expr.expr)
+		{
+			case EField(e, _) | EArray(e,_) | ECall(e,_):
+				unwrapExpr(e, ar);
+			case EConst(_)|EParenthesis(_):
+			default:
+				throw "Error: this type of expression is not supported";
+		}
+	}
+
 	static function isIdentifierAThisOrTypeExpr(expr:Expr) :Bool
 	{
 		var te = Context.typeExpr(expr);
-		return switch(te.expr)
+		return switch (te.expr)
 		{
 			case TConst(TThis) | TTypeExpr(_):
 				true;
@@ -564,139 +572,6 @@ class Nullsafety
 				false;
 		}
 	}
-	#end
-
-	macro public static function notNull(value:Expr)
-	{
-		return macro $value != null;
-	}
-
-	macro public static function sd(value:Expr)
-	{
-		//trace("EXP " + Context.getExpectedType());
-		trace(value);
-
-		var isVoidResult = true;
-		var resultType = Context.typeExpr(value).t;
-
-		var varCounter = 0;
-		function createVarName()
-		{
-			return _varPref + Std.string(++varCounter);
-		}
-
-		function getIfExpr(expr:Expr, subExpr:Expr, prevVar:String)
-		{
-			var ifExpr = {econd:null, eif:null, eelse:null};
-			switch (expr.expr)
-			{
-				case ExprDef.ECall(e, p):
-					switch (e.expr)
-					{
-						case EField(ef, f):
-
-						case EConst(CIdent(s)):
-
-						default:
-							throw "Error";
-					}
-				case ExprDef.EField(e, f):
-					trace("57");
-					var varName = createVarName();
-					var ifExpr = {econd:null, eif:null, eelse:null};
-					ifExpr.econd = macro $i {varName} != null;
-					if (prevVar == null)
-					{
-						//this is the last if body and we do not  need to assigh last call value
-						var exprAr = [macro $p {[varName, f]}, subExpr];
-						ifExpr.eif = macro $b {exprAr};
-						trace(ExprTools.toString(ifExpr.eif));
-					}
-					else
-					{
-						var exprAr = [ {expr:EBinop(OpAssign, macro $i{prevVar}, macro $p{[varName,f]}),pos:value.pos }, subExpr];
-						ifExpr.eif = macro $b {exprAr};
-					}
-					return getIfExpr(e, {expr:EIf(ifExpr.econd, ifExpr.eif, ifExpr.eelse), pos:value.pos}, varName);
-				default:
-					trace("75");
-					if (prevVar == null)
-					{
-						return macro $b {[expr, subExpr]};
-					}
-					else
-					{
-						var exprAr = [];
-						exprAr.push(Context.parse('var $prevVar =', value.pos));
-					}
-
-			}
-
-			//var ifExpr = {econd:null, eif:null, eelse:null};
-			//ifExpr.econd = macro { 4 >  Math.random() * 5; };
-			//ifExpr.eif = macro $b{[
-			//Context.parse('${_flagName} = true' ,expr.pos),
-			//expr
-			//]};
-			return macro $b {[ {expr:EIf(ifExpr.econd, ifExpr.eif, ifExpr.eelse), pos:expr.pos}]};
-		}
-
-		switch (value.expr)
-		{
-			case EConst(CInt(_) | CFloat(_) | CString(_) | CIdent("true" | "false" | "null")):
-			//return value;
-			//case ExprDef.EBinop(OpAssignOp(b), e1, e2):
-			//return macro $b{[
-			//{expr:EBinop(OpAssignOp(b), e1, getIfExpr(e2)), pos:value.pos}
-			//]};
-			//case ExprDef.EBinop(OpAssign, e1, e2):
-			//return macro $b{[
-			//{expr: EBinop(OpAssign, e1, getIfExpr(e2)), pos:value.pos}
-			//]};
-			//case ExprDef.EVars(va):
-			//if (va.length > 1)
-			//throw "don't work with multiple vars";
-			//var v = va[0];
-			//return macro $b{[
-			//{expr:EVars([{name:v.name, type:v.type, expr:getIfExpr(v.expr)}]), pos:value.pos}
-			//]};
-			default:
-				trace("107");
-				var resultExpr = [];
-				//resultExpr.push(Context.parse('var ${_flagName} = false', value.pos));
-				resultExpr.push(
-				{
-					expr: EVars([{name:_flagName, type:null, expr:macro false}]),
-					pos:value.pos
-				});
-				if (isVoidResult)
-				{
-					trace("115");
-					resultExpr.push(getIfExpr(value, macro $i {_flagName} = true, null));
-					resultExpr.push(macro $i {_flagName});
-					//resultExpr.push(Context.parse('${_flagName}', value.pos));
-				}
-				else
-				{
-					trace("122");
-					resultExpr.push(
-					{
-						expr:ExprDef.EVars([{name:_resName, type:null, expr:Context.parse(getTypeDefaultValue(resultType), value.pos)}]),
-						pos:value.pos
-					});
-					resultExpr.push(getIfExpr(value, null, _resName));
-					resultExpr.push(Context.parse('$_resName', value.pos));
-				}
-				trace(ExprTools.toString(macro $b {resultExpr}));
-				return return macro $b {resultExpr};
-
-		}
-
-		return value;
-	}
-
-	#if macro
-
 	#end
 
 	/**
@@ -781,30 +656,6 @@ class Nullsafety
 				throw "Error";
 		}
 		return Context.parse("throw 'Error'", value.pos);
-	}
-
-	/**
-	 * nullsafe chained calls
-	 * if any call returns null it stops
-	 * generate a number of (if != null) checks and local variables
-	 * no anonymous objects, functions and so on, strictly typed
-	 * wrapping part of the chain in parentheses will make it the fist
-	 * if condition i.e. safeCall((a.b.c).d) will generate one check if(a.b.c != null)
-	 * @param	value  -  call chain
-	 * @param	verboseNull - if true adds else branches that trace the name of the call that returned null
-	 */
-	macro public static function safeCall(value:Expr, verboseNull:Bool = false)
-	{
-		var actions = getStringActions(value);
-
-		//removing unnecessary parentheses
-		//TODO revise this, in some cases like cast this may be wrong
-		if (actions.length == 1)
-			return Context.parseInlineString(actions[0], value.pos);
-		var result = getIfElseCode(actions, verboseNull);
-		var code = '\n { ${result.start} \n ${result.end} \n ${result.flagVar}; \n}';
-		log(code);
-		return Context.parse(code, value.pos);
 	}
 
 	static function findTopExpr(expr:TypedExpr):ModuleType
@@ -1022,6 +873,13 @@ class Nullsafety
 		return res;
 	}
 	#end
+}
+
+private enum CallType
+{
+	SafeCall;
+	SafeGet(defTypeValue:Expr, defValue:Expr);
+	SafeGetNull(defValue:Expr);
 }
 
 @:publicFields
