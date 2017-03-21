@@ -48,10 +48,10 @@ class Nullsafety
 	{
 		log(value.toString());
 		log("--------------------------------");
-		
+
 		if (ExprTools.toString(value) == "@:this this")
 			throw "Do not use this as static extension, une import instead";
-			
+
 		var exprArray = [];
 		switch (value.expr)
 		{
@@ -184,7 +184,6 @@ class Nullsafety
 		if (exprArray.length == 0)
 			return macro {$firstCheckedExpr; true; };
 
-
 		return macro
 		{
 			var $_flagName = false;
@@ -192,15 +191,15 @@ class Nullsafety
 			$i{_flagName};
 		};
 	}
-	
+
 	macro public static function do_safe(value:Expr, callType:CallType )
 	{
 		log(value.toString());
 		log("--------------------------------");
-		
+
 		if (ExprTools.toString(value) == "@:this this")
 			throw "Do not use this as static extension, une import instead";
-			
+
 		var exprArray = [];
 		switch (value.expr)
 		{
@@ -209,7 +208,6 @@ class Nullsafety
 				unwrapExpr(e, exprArray);
 			default:
 				throw "Error: wrong expression";
-
 		}
 		if (exprArray.length == 0)
 			throw "Error: need more expressions";
@@ -236,14 +234,19 @@ class Nullsafety
 
 		createFinalIfBody = function(exprCall:Expr)
 		{
-			switch(callType)
+			switch (callType)
 			{
 				case SafeCall:
-					return macro { $exprCall; $i{_flagName} = true;};
-				case SafeGet(d):
-				return macro { $i{_resName} = $exprCall
+					return macro { $exprCall; $i{_flagName} = true; };
+				case SafeGet(_, _=>null):
+					return macro $i{_resName} = $exprCall;
+				case SafeGet(_, _):
+					return macro { $i{_resName} = $exprCall; $i{_flagName} = true;};
+				case SafeGetNull(_ => null):
+					return macro $i {_resName} = $exprCall;
+				case SafeGetNull(dv):
+					return macro { $i{_resName} = $exprCall; if ($i{_resName} == null) $i{_resName} = $dv;};
 			}
-			
 		};
 
 		parseExpr = function(expr:Expr, prevVar:String)
@@ -337,19 +340,39 @@ class Nullsafety
 			default:
 				throw "Error";
 		}
-		if (exprArray.length == 0)
-			return macro {$firstCheckedExpr; true; };
 
-
-		return macro
+		switch (callType)
 		{
-			var $_flagName = false;
-			${createNextTempVarAndIf(firstCheckedExpr)};
-			$i{_flagName};
-		};
+			case SafeCall:
+				return macro {
+					var $_flagName = false;
+					${createNextTempVarAndIf(firstCheckedExpr)};
+					$i{_flagName};
+				};
+			case SafeGet(dtv, _=>null):
+				return macro {
+					var $_resName = $dtv;
+					${createNextTempVarAndIf(firstCheckedExpr)};
+					$i{_resName};
+				};
+			case SafeGet(dtv, dv):
+				return macro {
+					var $_flagName = false;
+					var $_resName = $dtv;
+					${createNextTempVarAndIf(firstCheckedExpr)};
+					if (!$i{_flagName})
+						$i{_resName} = $dv;
+				};
+			case SafeGetNull(_):
+				return macro {
+					var $_resName = null;
+					${createNextTempVarAndIf(firstCheckedExpr)};
+					$i{_resName};
+				};
+		}
+		
 	}
-	
-	
+
 	/*
 	var name = safeGet2((core.root).getChilf().getPos(), new Point());
 	var name;
@@ -370,182 +393,6 @@ class Nullsafety
 	if(safeGet2(core.root.isAdded(), false))
 
 	*/
-	macro public static function safeGet2(value:Expr, defaultExpr:Expr = null)
-	{
-		log(value.toString());
-		log("--------------------------------");
-
-		//decide what type are we waiting
-		var valueType = Context.typeExpr(value).t;
-		trace("valueType ", valueType);
-		switch (valueType)
-		{
-			case TAbstract(_.get() => {name:"Void"}, _):
-				throw "Error: expression return must not be Void";
-			default:
-		}
-
-		var expectedType = Context.getExpectedType();
-		trace("Expected Type ", expectedType);
-		if (expectedType != null)
-		{
-			switch (expectedType)
-			{
-				case TMono(_):
-					expectedType = null;
-				default:
-			}
-		}
-
-		var defaultExprType = defaultExpr == null ? null : Context.typeExpr(defaultExpr).t;
-		trace("defaultExprType ", defaultExprType);
-
-		//-
-		var exprArray = [];
-		switch (value.expr)
-		{
-			case EArray(e, _) | EField(e, _) | ECall(e, _):
-				exprArray.push(value);
-				unwrapExpr(e, exprArray);
-			default:
-				throw "Error: wrong expression";
-
-		}
-		if (exprArray.length == 0)
-			throw "Error: need more expressions";
-
-		var createVarName:Void->String;
-		var parseExpr:Expr->String->Expr;
-		var createNextTempVarAndIf:Expr->Expr;
-		var createFinalIfBody:Expr->Expr;
-		var varCounter = 0;
-		createVarName = function() return _varPref + Std.string(++varCounter);
-
-		createNextTempVarAndIf = function(exprCall:Expr)
-		{
-			var newVar = createVarName();
-			return macro
-			{
-				var $newVar = $exprCall;
-				if ($i{newVar} != null)
-				{
-					$ {parseExpr(exprArray.pop(), newVar)};
-				}
-			};
-		};
-
-		createFinalIfBody = function(exprCall:Expr)
-		{
-			return macro { $exprCall; $i{_flagName} = true;};
-		};
-
-		parseExpr = function(expr:Expr, prevVar:String)
-		{
-			switch (expr.expr)
-			{
-				case EField(e, f):
-					if (exprArray.length > 0)
-					{
-						var nextExpr = exprArray[exprArray.length - 1];
-						switch (nextExpr.expr)
-						{
-							case ECall(e, p):
-								//if there is a call after field, do not check fiels alone
-								exprArray.pop();
-								var callExpr = {expr:ECall(macro $i{prevVar} .$f, p), pos:expr.pos};
-								if (exprArray.length > 0)
-									return createNextTempVarAndIf(callExpr);
-								else
-									return createFinalIfBody(callExpr);
-							default:
-								return createNextTempVarAndIf(macro $i {prevVar} .$f);
-
-						}
-					}
-					else
-						return createFinalIfBody(macro $i {prevVar} .$f);
-				case ECall(e, p):
-					//possible only after parentses or other call or array
-					var callExpr = {expr:ECall(macro $i{prevVar}, p), pos:e.pos};
-					if (exprArray.length > 0)
-						return createNextTempVarAndIf(callExpr);
-					else
-						return createFinalIfBody(callExpr);
-				case EArray(e1, e2):
-					var callExpr = macro $i {prevVar} [$e2];
-					if (exprArray.length > 0)
-						return createNextTempVarAndIf(callExpr);
-					else
-						return createFinalIfBody(callExpr);
-				default:
-					throw "Error";
-			}
-		};
-		var firstExpr = exprArray.pop();
-		var firstCheckedExpr;
-		switch (firstExpr.expr)
-		{
-			case EField(e, f):
-				firstCheckedExpr = macro $i {f};
-			case EParenthesis(e):
-				firstCheckedExpr = e;
-			case EConst(CIdent(s)):
-				if (isIdentifierAThisOrTypeExpr(firstExpr))
-				{
-					if (exprArray.length > 0)
-					{
-						var nextExpr = exprArray.pop();
-						switch (nextExpr.expr)
-						{
-							case EField(e, f):
-								if (exprArray.length > 0)
-								{
-									var nextNextExpr = exprArray[exprArray.length-1];
-									switch (nextNextExpr.expr)
-									{
-										case ECall(ec, p):
-											exprArray.pop();
-											firstCheckedExpr = {expr:ECall(macro $i{s} .$f, p), pos:ec.pos};
-										default:
-											firstCheckedExpr = macro $i {s} .$f;
-									}
-								}
-								else
-								{
-									firstCheckedExpr = macro $i {s} .$f;
-								}
-							default:
-								throw "Error";
-						}
-					}
-					else
-					{
-						throw "Error";
-					}
-				}
-				else
-				{
-					firstCheckedExpr = macro $i {s};
-				}
-			default:
-				throw "Error";
-		}
-		if (exprArray.length == 0)
-			return macro {$firstCheckedExpr; true; };
-
-		var newVar = createVarName();
-
-		return macro
-		{
-			var $_flagName = false;
-			var $newVar = $firstCheckedExpr;
-			if ($i{newVar} != null)
-			{
-				$ {parseExpr(exprArray.pop(), newVar)};
-			}
-			$i{_flagName};
-		};
-	}
 
 	#if macro
 	public static function unwrapExpr(expr:Expr, ar:Array<Expr>)
@@ -587,97 +434,29 @@ class Nullsafety
 	 */
 	macro public static function safeGet(value:Expr, defaultValue:Expr = null, verboseNull:Bool = false)
 	{
-		if (defaultValue == null)
-			defaultValue = macro null;
-
-		var type;
-		var isVarCreated = false;
-		switch (value.expr)
-		{
-			case ExprDef.EVars(va):
-				if (va.length > 1)
-					throw "Can't work with several vars";
-				var v = va[0];
-				isVarCreated = true;
-
-			case ExprDef.EBinop(OpAssignOp(_) | OpAssign, e1, e2):
-
-			default:
-		}
-
-		if (type == null)
-			type = Context.typeExpr(value).t;
-		var actions = getStringActions(value);
-		var defaultValueCode = ExprTools.toString(defaultValue);
-
-		var code = "";
-		var typeDefaultValue = getTypeDefaultValue(type);
-		var isNull = typeDefaultValue == "null";
-		if (isNull)
-		{
-			if (actions.length == 1)
-			{
-				code  = '\n { ';
-				code += '\n var _opt_0 = ${actions[0]};';
-				code += '\n if (${actions[0]} == null) _opt_0 = ${defaultValueCode};';
-				code += '\n _opt_0;';
-				code += '\n }';
-				return Context.parse(code, value.pos);
-			}
-			else if (actions.length > 1)
-			{
-				var res = getIfElseCode(actions, verboseNull);
-				var code = res.start + res.end;
-				var resVar = res.resVar;
-				code += '\n if($resVar == null) $resVar = $defaultValueCode ; \n $resVar; \n }';
-
-				return Context.parse(code, value.pos);
-			}
-			else
-				throw "Error";
-		}
-		else
-		{
-			if (actions.length == 1)
-			{
-				return value;
-			}
-			else if (actions.length > 1)
-			{
-				var res = getIfElseCode(actions, verboseNull, true, typeDefaultValue);
-				var code = res.start + res.end;
-				var resVar = res.resVar;
-				var flagVar = res.flagVar;
-				code += '\n if($flagVar) $resVar = $defaultValueCode ; \n $resVar;}';
-
-				return Context.parse(code, value.pos);
-			}
-			else
-				throw "Error";
-		}
-		return Context.parse("throw 'Error'", value.pos);
-	}
-
-	static function findTopExpr(expr:TypedExpr):ModuleType
-	{
-		switch (expr.expr)
-		{
-			case TypedExprDef.TArray(a, e):
-				log('TArray');
-				return findTopExpr(a);
-			case TypedExprDef.TField(e, fa):
-				log('TField');
-				return findTopExpr(e);
-			case TypedExprDef.TTypeExpr(m):
-				log('TTypeExpr');
-				return m;
-			case TypedExprDef.TCall(e, el):
-				log('TCall');
-				return findTopExpr(e);
-			default:
-		}
 		return null;
 	}
+
+	//static function findTopExpr(expr:TypedExpr):ModuleType
+	//{
+	//switch (expr.expr)
+	//{
+	//case TypedExprDef.TArray(a, e):
+	//log('TArray');
+	//return findTopExpr(a);
+	//case TypedExprDef.TField(e, fa):
+	//log('TField');
+	//return findTopExpr(e);
+	//case TypedExprDef.TTypeExpr(m):
+	//log('TTypeExpr');
+	//return m;
+	//case TypedExprDef.TCall(e, el):
+	//log('TCall');
+	//return findTopExpr(e);
+	//default:
+	//}
+	//return null;
+	//}
 
 	static function getTypeDefaultValueExpr(type:Type):Expr
 	{
@@ -694,185 +473,185 @@ class Nullsafety
 		}
 	}
 
-	static function getTypeDefaultValue(type:Type):String
-	{
-		switch (type)
-		{
-			case Type.TAbstract(_.get()=> {name:"Int"}, _):
-				return "0";
-			case Type.TAbstract(_.get() => {name:"Float"}, _):
-				return "0.0";
-			case Type.TAbstract(_.get() => {name:"Bool"}, _):
-				return "false";
-			default:
-				return "null";
-		}
-	}
+	//static function getTypeDefaultValue(type:Type):String
+	//{
+	//switch (type)
+	//{
+	//case Type.TAbstract(_.get()=> {name:"Int"}, _):
+	//return "0";
+	//case Type.TAbstract(_.get() => {name:"Float"}, _):
+	//return "0.0";
+	//case Type.TAbstract(_.get() => {name:"Bool"}, _):
+	//return "false";
+	//default:
+	//return "null";
+	//}
+	//}
 
-	#if macro
-	static function getStringActions(value:Expr):Array<String>
-	{
-		log(Std.string(Context.typeof(value)));
-		var te = Context.typeExpr(value);
-		if (ExprTools.toString(value) == "@:this this")
-			throw "Do not use this as static extension, une import static methods instead";
-		var code = ExprTools.toString(value);
-		log(code);
-		var topModuleType = findTopExpr(te);
-		var stClassName = "";
-		if (topModuleType != null)
-		{
-			switch (topModuleType)
-			{
-				case ModuleType.TClassDecl(c):
-					stClassName = c.get().name;
-				case ModuleType.TEnumDecl(e):
-					stClassName = e.get().name;
-				case ModuleType.TTypeDecl(t):
-					stClassName = t.get().name;
-				case ModuleType.TAbstract(a):
-					stClassName = a.get().name;
-			}
-		}
+	//#if macro
+	//static function getStringActions(value:Expr):Array<String>
+	//{
+	//log(Std.string(Context.typeof(value)));
+	//var te = Context.typeExpr(value);
+	//if (ExprTools.toString(value) == "@:this this")
+	//throw "Do not use this as static extension, une import static methods instead";
+	//var code = ExprTools.toString(value);
+	//log(code);
+	//var topModuleType = findTopExpr(te);
+	//var stClassName = "";
+	//if (topModuleType != null)
+	//{
+	//switch (topModuleType)
+	//{
+	//case ModuleType.TClassDecl(c):
+	//stClassName = c.get().name;
+	//case ModuleType.TEnumDecl(e):
+	//stClassName = e.get().name;
+	//case ModuleType.TTypeDecl(t):
+	//stClassName = t.get().name;
+	//case ModuleType.TAbstract(a):
+	//stClassName = a.get().name;
+	//}
+	//}
+//
+	//var actions = [];
+//
+	//function parseCode()
+	//{
+	//var a = "";
+	//var ci = 0;
+	//var c = "";
+	//function findNext(symbol, guard)
+	//{
+	//log("find " + symbol);
+	//ci++;
+	//while (ci < code.length)
+	//{
+	//c = code.charAt(ci);
+	//a += c;
+	//if (c == guard)
+	//findNext(symbol, guard);
+	//else if (c == symbol)
+	//break;
+	//ci++;
+	//}
+	//}
+	//while (ci < code.length)
+	//{
+	//c = code.charAt(ci);
+	//switch (c)
+	//{
+	//case "(":
+	//a += c;
+	//findNext(")", "(");
+	//case "[":
+	//a += c;
+	//findNext("]", "[");
+	//case "{":
+	//a += c;
+	//findNext("}", "{");
+	//case ".":
+	//actions.push(a);
+	//a = "";
+	//default:
+	//a += c;
+	//}
+	//ci++;
+	//}
+	//actions.push(a);
+	//}
+//
+	//if (stClassName != "")
+	//{
+	//var a = "";
+	//var i = code.indexOf(stClassName);
+	//if (i >= 0)
+	//{
+	//a = code.substr(0, i);
+	//log("a " + a);
+	//code = code.substr(i + stClassName.length + 1);
+	//var nextPoint = code.indexOf(".");
+	//if (nextPoint > 0)
+	//{
+	//var fieldName = code.substring(0, code.indexOf("."));
+	//actions.push(a + stClassName + "." + fieldName);
+	//code = code.substr(nextPoint + 1);
+	//parseCode();
+	//}
+	//else
+	//actions.push(a + stClassName + "." + code);
+	//}
+	//}
+	//else
+	//{
+	//parseCode();
+	//}
+//
+	////do we need this? can it cause issues?
+	//for (i in 0...actions.length)
+	//{
+	//var a:String = actions[i];
+	//if (a.charAt(0) == "(" && a.charAt(a.length - 1) == ")")
+	//{
+	//a = a.substring(1, a.length - 1);
+	//actions[i] = a;
+	//}
+	//}
+//
+	//return actions;
+	//}
 
-		var actions = [];
-
-		function parseCode()
-		{
-			var a = "";
-			var ci = 0;
-			var c = "";
-			function findNext(symbol, guard)
-			{
-				log("find " + symbol);
-				ci++;
-				while (ci < code.length)
-				{
-					c = code.charAt(ci);
-					a += c;
-					if (c == guard)
-						findNext(symbol, guard);
-					else if (c == symbol)
-						break;
-					ci++;
-				}
-			}
-			while (ci < code.length)
-			{
-				c = code.charAt(ci);
-				switch (c)
-				{
-					case "(":
-						a += c;
-						findNext(")", "(");
-					case "[":
-						a += c;
-						findNext("]", "[");
-					case "{":
-						a += c;
-						findNext("}", "{");
-					case ".":
-						actions.push(a);
-						a = "";
-					default:
-						a += c;
-				}
-				ci++;
-			}
-			actions.push(a);
-		}
-
-		if (stClassName != "")
-		{
-			var a = "";
-			var i = code.indexOf(stClassName);
-			if (i >= 0)
-			{
-				a = code.substr(0, i);
-				log("a " + a);
-				code = code.substr(i + stClassName.length + 1);
-				var nextPoint = code.indexOf(".");
-				if (nextPoint > 0)
-				{
-					var fieldName = code.substring(0, code.indexOf("."));
-					actions.push(a + stClassName + "." + fieldName);
-					code = code.substr(nextPoint + 1);
-					parseCode();
-				}
-				else
-					actions.push(a + stClassName + "." + code);
-			}
-		}
-		else
-		{
-			parseCode();
-		}
-
-		//do we need this? can it cause issues?
-		for (i in 0...actions.length)
-		{
-			var a:String = actions[i];
-			if (a.charAt(0) == "(" && a.charAt(a.length - 1) == ")")
-			{
-				a = a.substring(1, a.length - 1);
-				actions[i] = a;
-			}
-		}
-
-		return actions;
-	}
-
-	static function getIfElseCode(actions:Array<String>, verboseNull:Bool, varForTheLastCall = false, defaultVarValue = "null")
-	{
-		var i = 0;
-		function genName() return '_opt_' + Std.string(i);
-		var prevVar = genName();
-		var nextVar;
-		var code = "\n var _opt_flag = false;";
-		if (varForTheLastCall)
-			code += '\n var _opt_0res = $defaultVarValue ;';
-		code += "\n var " + prevVar +" = " + actions[0] + ";" ;
-		var closing = "";
-		i = 1;
-		while (i < actions.length-1)
-		{
-			nextVar = genName();
-			log(actions[i]);
-			code += '\n if($prevVar != null) {';
-			code += '\n var $nextVar = ${prevVar}.${actions[i]};';
-			if (verboseNull)
-				closing = "\n } else {trace('"+prepareStr(actions[i-1])+" call returend null');}" + closing;
-			else
-				closing = "\n }" + closing;
-			prevVar = nextVar;
-			i++;
-		}
-		nextVar = genName();
-		code += "\n if(" + prevVar + " != null) {";
-		code += '\n _opt_flag = true;';
-		if (varForTheLastCall)
-			code += "\n _opt_0res = " + prevVar + "." + actions[i] + ";";
-		else
-			code += "\n " + prevVar + "." + actions[i] + ";";
-		if (verboseNull)
-			closing = "\n } else {trace('"+prepareStr(actions[i-1])+" call returend null');}" + closing;
-		else
-			closing = "\n }" + closing;
-
-		return {start:code, end:closing, resVar:"_opt_0res", flagVar:"_opt_flag"};
-	}
-	static function prepareStr(str:String):String
-	{
-		var res = "";
-		for (i in 0...str.length)
-		{
-			var c = str.charAt(i);
-			if (c != "'" && c != '"' && c != "$" && c != '\\')
-				res += c;
-		}
-		return res;
-	}
-	#end
+	//static function getIfElseCode(actions:Array<String>, verboseNull:Bool, varForTheLastCall = false, defaultVarValue = "null")
+	//{
+	//var i = 0;
+	//function genName() return '_opt_' + Std.string(i);
+	//var prevVar = genName();
+	//var nextVar;
+	//var code = "\n var _opt_flag = false;";
+	//if (varForTheLastCall)
+	//code += '\n var _opt_0res = $defaultVarValue ;';
+	//code += "\n var " + prevVar +" = " + actions[0] + ";" ;
+	//var closing = "";
+	//i = 1;
+	//while (i < actions.length-1)
+	//{
+	//nextVar = genName();
+	//log(actions[i]);
+	//code += '\n if($prevVar != null) {';
+	//code += '\n var $nextVar = ${prevVar}.${actions[i]};';
+	//if (verboseNull)
+	//closing = "\n } else {trace('"+prepareStr(actions[i-1])+" call returend null');}" + closing;
+	//else
+	//closing = "\n }" + closing;
+	//prevVar = nextVar;
+	//i++;
+	//}
+	//nextVar = genName();
+	//code += "\n if(" + prevVar + " != null) {";
+	//code += '\n _opt_flag = true;';
+	//if (varForTheLastCall)
+	//code += "\n _opt_0res = " + prevVar + "." + actions[i] + ";";
+	//else
+	//code += "\n " + prevVar + "." + actions[i] + ";";
+	//if (verboseNull)
+	//closing = "\n } else {trace('"+prepareStr(actions[i-1])+" call returend null');}" + closing;
+	//else
+	//closing = "\n }" + closing;
+//
+	//return {start:code, end:closing, resVar:"_opt_0res", flagVar:"_opt_flag"};
+	//}
+	//static function prepareStr(str:String):String
+	//{
+	//var res = "";
+	//for (i in 0...str.length)
+	//{
+	//var c = str.charAt(i);
+	//if (c != "'" && c != '"' && c != "$" && c != '\\')
+	//res += c;
+	//}
+	//return res;
+	//}
+	//#end
 }
 
 private enum CallType
