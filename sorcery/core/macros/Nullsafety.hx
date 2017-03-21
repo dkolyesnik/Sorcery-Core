@@ -23,6 +23,18 @@ class Nullsafety
 	}
 	#end
 
+	/*
+	 * Will not check if the fiels that is called as function is not null
+	 * so in case of function type field like 
+	 * class SomeClass {
+	 * 		public var f:Void->Void;
+	 * }
+	 * there will be an runtime error if f is a null
+	 * Parentses can be uset to bypass this if it is a start of the expr:
+	 * safeGet((SomeClass.f)()) - this way it will check if SomeClass.f != null
+	 * 
+	 * */
+	
 	/**
 	 * nullsafe chained calls
 	 * return true if last expression is executed, false otherwise
@@ -58,7 +70,7 @@ class Nullsafety
 		log(Std.string(value.pos));
 		log(value);
 		log(defaultValue);
-		
+
 		var returnType = Context.typeExpr(value).t;
 		var isNullable = false;
 		var defaultTypeValue = switch (returnType)
@@ -75,13 +87,13 @@ class Nullsafety
 				isNullable = true;
 				macro null;
 		}
-		switch(defaultValue.expr)
+		switch (defaultValue.expr)
 		{
 			case EConst(CIdent(_ => "null")):
 				defaultValue = null;
 			default:
 		}
-		
+
 		return _doit(value, isNullable ? CTSafeGetNull(defaultValue) : CTSafeGet(defaultTypeValue, defaultValue));
 	}
 	#if macro
@@ -92,7 +104,7 @@ class Nullsafety
 	public static function _doit(value:Expr, callType:CallType )
 	{
 		log(callType.getName());
-		
+
 		if (ExprTools.toString(value) == "@:this this")
 			throw "Do not use this as static extension, une import instead";
 
@@ -158,7 +170,7 @@ class Nullsafety
 							case ECall(e, p):
 								//if there is a call after field, do not check fiels alone
 								exprArray.pop();
-								var callExpr = {expr:ECall(macro $i{prevVar}.$f, p), pos:expr.pos};
+								var callExpr = {expr:ECall(macro $i{prevVar} .$f, p), pos:expr.pos};
 								if (exprArray.length > 0)
 									return createNextTempVarAndIf(callExpr);
 								else
