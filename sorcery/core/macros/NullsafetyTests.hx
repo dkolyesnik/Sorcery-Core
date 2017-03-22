@@ -1,96 +1,114 @@
 package sorcery.core.macros;
 import haxe.unit.TestCase;
-import sorcery.core.macros.Nullsafety.*;
+import sorcery.macros.Nullsafety.*;
 import sorcery.core.macros.NullsafetyTests.B;
 import thx.Assert.*;
 /**
  * ...
  * @author Dmitriy Kolesnik
  */
-class NullsafetyTests
+class NullsafetyTests extends TestCase
 {
 	static var stA:A;
 	static var ar:Array<A>;
 	var a:A;
 	public var fCallAsserted = false;
-	
-	public function new() 
+	var s = {a:{c:"10", i:5, f:function() return "f" }, b:10 };
+	var s1 = {a:{c:"10", i:5, f:function() return "f" }, b:10 };
+	var aWithBnull:A;
+	public function new()
 	{
+		super();
 	}
-	
-	
-	public function setup():Void 
+
+	override public function setup():Void
 	{
 		a = new A(this);
 		stA = new A(this);
-		ar = [new A(this)];
+		
 		fCallAsserted = false;
+		s1.a = null;
+		aWithBnull = new A(this);
+		aWithBnull.b = null;
+		ar = [new A(this), aWithBnull];
 	}
 	
-	public function testSafeCall() {
-		setup();
+	public function testSafeCall()
+	{
 		var localA = new A(this);
-		
-		
+
 		trace("Function call starting from static field");
 		{
 			fCallAsserted = false;
 			var isCalled = safeCall(stA.b.f());
-			
+
 			isTrue(isCalled);
 			isTrue(fCallAsserted);
 		}
-		
-		//TODO 
+
+		//TODO
 		//trace("Null function call starting from static field");
 		//{
-			//var isCalled = safeCall(stA.b.fEmpty());
-			//
-			//isFalse(isCalled);
+		//var isCalled = safeCall(stA.b.fEmpty());
+		//
+		//isFalse(isCalled);
 		//}
-		
-		trace("start from local ident");
-		isTrue(safeCall(localA.b.i));
-		isTrue(safeCall((localA.b).f));
-		isTrue(safeCall(localA.b.f()));
-		
-		
+
+		assertTrue(safeCall(localA.b.i));
+		assertTrue( safeCall((localA.b.f)()) );
+		assertTrue(safeCall(localA.b.f()));
+		assertTrue(safeCall(s.a.f()));
+		assertFalse(safeCall(s1.a.f()));
+		assertTrue(safeCall(ar[0].b.f()));
 	}
 	
 	public function testSafeGet()
 	{
-		setup();
 		var localA = new A(this);
-		var aWithBnull = new A(this);
-		aWithBnull.b = null;
-		
+
 		var x = safeGet(localA.b.fl);
-		equals(x, localA.b.fl);
-		x = safeGet(aWithBnull.b.fl);
-		equals(x, 0);
-		equals(50, safeGet(aWithBnull.b.fl, 50));
-		equals(100, safeGet(NullsafetyTests.stA.b.i));
-		equals(100, safeGet((NullsafetyTests.stA).b.i));
-		var bb = safeGet(aWithBnull.b);
-		equals(bb, null);
+		assertEquals(x, localA.b.fl);
 		
+		x = safeGet(aWithBnull.b.fl);
+		assertEquals(x, 0);
+		
+		assertEquals(50.0, safeGet(aWithBnull.b.fl, 50.0));
+		assertEquals(100, safeGet(NullsafetyTests.stA.b.i));
+		assertEquals(100, safeGet((NullsafetyTests.stA).b.i));
+		
+		var bb = safeGet(aWithBnull.b);
+		assertEquals(bb, null);
+
 		bb = null;
 		bb = safeGet(this.a.b);
-		equals(bb, a.b);
-		
+		assertEquals(bb, a.b);
+
 		var aar = [aWithBnull];
-		equals(null, safeGet(aar[0].b.str));
+		assertEquals(null, safeGet(aar[0].b.str));
+
+		assertEquals(safeGet(s.a.i, 0), 5);
+		assertEquals(safeGet(ar[0].b.str), "someStr");
+		assertEquals(safeGet(ar[1].b.str), null);
+		
+		assertEquals(safeGet(s1.a.c, "1"),"1");
+		assertEquals(safeGet(s1.a.c.charAt(0), "1"), "1");
+
+		assertEquals(safeGet(s.a.i, 0), 5);
+
+		assertEquals(safeGet(s1.a.c,"s"),"s");
+		assertEquals(safeGet(s1.a.i, 0),0);
+
 	}
 }
 
 class A
 {
 	public var b:B;
-	public function new(tc:NullsafetyTests){
+	public function new(tc:NullsafetyTests)
+	{
 		b = new B(tc);
 	}
 }
-
 
 class B
 {
@@ -98,17 +116,18 @@ class B
 	public var i = 100;
 	public var fl = 100.0;
 	public var d:Dynamic;
-	public function f(){
+	public function f()
+	{
 		tc.fCallAsserted = true;
 	}
-	
+
 	public function getB():B
 	{
 		return this;
 	}
-	
+
 	public var fEmpty:Void->Void = null;
-	
+
 	var tc:NullsafetyTests;
 	public function new(tc:NullsafetyTests)
 	{

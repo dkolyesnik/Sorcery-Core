@@ -4,7 +4,7 @@ import haxe.macro.Expr;
 import haxe.macro.Type.FieldKind;
 import sorcery.core.macros.MacroClassBuilder;
 using sorcery.core.macros.MacroHelperTools;
-import sorcery.core.macros.Nullsafety.*;
+import sorcery.macros.Nullsafety.*;
 /**
  * ...
  * @author Dmitriy Kolesnik
