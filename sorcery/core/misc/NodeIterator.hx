@@ -152,7 +152,7 @@ class NodeIterator<T:ISystemNode> implements INodeIterator implements HaxeContra
 			_onRemoveCallback(cast node);
 	}
 	
-	function onAdded(node:ISystemNode) 
+	function onAdded(node:ISystemNode):Void
 	{
 		Contract.requires(node != null);
 		

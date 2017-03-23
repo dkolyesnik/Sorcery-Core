@@ -2,8 +2,7 @@ package sorcery.core.misc;
 import sorcery.core.SystemNode;
 import sorcery.core.interfaces.INodeIterator;
 import sorcery.core.interfaces.ISystemNode;
-import hxsignal.Signal;
-	
+import sorcery.core.abstracts.Signal;	
 
 /**
  * ...
@@ -15,13 +14,13 @@ class NodeList
 {
 	var head(default,null):ISystemNode;
 	var end(default, null):ISystemNode;
-	public var onAdd:Signal<ISystemNode->Void>;
-	public var onRemove:Signal<ISystemNode->Void>;
+	public var onAdd:Signal<ISystemNode>;
+	public var onRemove:Signal<ISystemNode>;
 	
 	public function new()
 	{
-		onAdd = new Signal<ISystemNode->Void>();
-		onRemove = new Signal<ISystemNode->Void>();
+		onAdd = new Signal<ISystemNode>();
+		onRemove = new Signal<ISystemNode>();
 	}
 
 	public function add(node:ISystemNode):Void
