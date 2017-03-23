@@ -14,13 +14,24 @@ class NodeList
 {
 	var head(default,null):ISystemNode;
 	var end(default, null):ISystemNode;
-	public var onAdd:Signal<ISystemNode>;
-	public var onRemove:Signal<ISystemNode>;
+	var onAddEmitter:SignalEmitter<ISystemNode>;
+	public var onAdd(get, never):Signal<ISystemNode>;
+	inline public function get_onAdd():Signal<ISystemNode>
+	{
+		return onAddEmitter.getSignal();
+	}
+	
+	var onRemoveEmitter:SignalEmitter<ISystemNode>;
+	public var onRemove(get, never):Signal<ISystemNode>;
+	inline public function get_onRemove():Signal<ISystemNode>
+	{
+		return onRemoveEmitter.getSignal();
+	}
 	
 	public function new()
 	{
-		onAdd = new Signal<ISystemNode>();
-		onRemove = new Signal<ISystemNode>();
+		onAddEmitter = new SignalEmitter<ISystemNode>();
+		onRemoveEmitter = new SignalEmitter<ISystemNode>();
 	}
 
 	public function add(node:ISystemNode):Void
@@ -37,12 +48,12 @@ class NodeList
 			end = node;
 		}
 		node.list = this;
-		onAdd.emit(node);
+		onAddEmitter.emit(node);
 	}
 
 	public function remove(node:ISystemNode):Void
 	{
-		onRemove.emit(node);
+		onRemoveEmitter.emit(node);
 		if (node.prev != null)
 			node.prev.next = node.next;
 		if (node.next != null)
