@@ -1,6 +1,5 @@
 package sorcery.core.abstracts;
 import sorcery.core.interfaces.IEntity;
-import sorcery.core.CoreNames;
 
 /**
  * ...
@@ -8,6 +7,7 @@ import sorcery.core.CoreNames;
  */
 abstract Path(String) from String to String
 {
+	inline static public var ROOT = '#';
 	inline public static var TO_PARENT = "@";
 	inline public static var TO_GROUP = ".";
 	inline public static var TO_COMPONENT = ":";
@@ -73,7 +73,7 @@ abstract Path(String) from String to String
 		switch (this.charAt(0))
 		{
 			case ":": return entity.fullName + this;
-			case CoreNames.ROOT: return this;
+			case ROOT: return this;
 			case TO_GROUP: return resolveGroupPath(this, entity);
 			case TO_PARENT: return resolveParentsPath(this, entity);
 			default: return entity.group.fullName + "." + this;
@@ -88,7 +88,7 @@ abstract Path(String) from String to String
 			var c = s.charAt(i);
 			if (c == TO_PARENT)
 			{
-				if (parent.name == CoreNames.ROOT)
+				if (parent.name == ROOT)
 					return null;
 				parent = parent.parent;
 			}
@@ -112,7 +112,7 @@ abstract Path(String) from String to String
 			var c = s.charAt(i);
 			if (c == TO_GROUP)
 			{
-				if (group.name == CoreNames.ROOT)
+				if (group.name == ROOT)
 					return null;
 				group = group.parentGroup;
 			}

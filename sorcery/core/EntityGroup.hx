@@ -3,10 +3,10 @@
  */
 package sorcery.core;
 
-import sorcery.core.CoreNames;
 import sorcery.core.abstracts.Agenda;
 import sorcery.core.abstracts.EntityName;
 import sorcery.core.abstracts.FullName;
+import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.IAgendaChild;
 import sorcery.core.interfaces.IAgendaManager;
 import sorcery.core.interfaces.ICloneable;
@@ -56,7 +56,7 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 	// ==============================================================================
 	public function findEntity(p_name : String) : IEntity
 	{
-		Contract.requires(EntityName.validate(p_name) || (p_name == CoreNames.ROOT && _wrappedEntity.name == CoreNames.ROOT));
+		Contract.requires(EntityName.validate(p_name) || (p_name == Path.ROOT && _wrappedEntity.name == CoreNames.ROOT));
 		
 		return _entitiesByName[p_name];
 	}
@@ -65,7 +65,7 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 	function registerEntity(p_entity : IEntity) : Void
 	{
 		Contract.requires(p_entity != null, "Entity must not be null");
-		Contract.requires((_wrappedEntity.name == CoreNames.ROOT && p_entity == _wrappedEntity) || EntityName.validate(p_entity.name), "Invalid entity name");
+		Contract.requires((_wrappedEntity.name == Path.ROOT && p_entity == _wrappedEntity) || EntityName.validate(p_entity.name), "Invalid entity name");
 		
 		if (_entitiesByName.exists(p_entity.name))
 		{
@@ -103,6 +103,11 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 	public function asEntity():IEntity
 	{
 		return this;
+	}
+	
+	public function onCachedByFullName():Void
+	{
+		_wrappedEntity.onCachedByFullName();
 	}
 	
 	public function castTo<T>(cl:Class<T>):T

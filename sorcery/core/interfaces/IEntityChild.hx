@@ -16,6 +16,9 @@ interface IEntityChild extends IAgendaChild
 	function isActivated():Bool;
 	function isAddedToRoot() : Bool;
 	
+	@:noCompletion
+	function onCachedByFullName():Void;
+	
 	function asEntity():IEntity;
 
 	function setName(p_name : String) : IEntityChild;
@@ -37,7 +40,6 @@ interface IEntityChild extends IAgendaChild
 	private function addToParent(p_parent:IEntity):Void;
 	private function removeFromParent():Void;
 	
-
 	private function addToRoot():Void;
 	private function removeFromRoot():Void;
 	

@@ -171,7 +171,7 @@ class SystemNodeBuildMacro
 				access:[APublic, AOverride],
 				kind:FieldType.FFun({
 					args:[],
-					expr: {expr: ExprDef.EBlock(unprepareExprArray), pos:Context.currentPos()},
+					expr: $b{unprepareExprArray},
 					ret: macro: Void
 				}),
 				pos:Context.currentPos()

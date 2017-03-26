@@ -32,17 +32,6 @@ class MacroClassBuilder
 		fieldsSnapshot = fields.copy();
 	}
 	
-	public function doStuff(actions:Array<Field->Void>)
-	{
-		for (a in actions)
-		{
-			for (f in fieldsSnapshot)
-			{
-				a(f);
-			}
-		}
-	}
-	
 	public function addField(field:Field, front = false)
 	{
 		if (superClass != null)
@@ -56,8 +45,12 @@ class MacroClassBuilder
 			fields.push(field);
 	}
 	
-	public function export(?verboseExport):Array<Field>
+	public function export(verboseExport = false):Array<Field>
 	{
+		if (verboseExport)
+			for (f in fields)
+				trace(f);
+				
 		return fields;
 	}
 	

@@ -6,7 +6,6 @@ package sorcery.core;
 import sorcery.core.abstracts.ComponentName;
 import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.IComponent;
-import sorcery.core.interfaces.IChildLink;
 import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.IAgendaChild;
@@ -132,8 +131,8 @@ class Component extends sorcery.core.EntityChild implements IComponent implement
 	@:noCompletion
 	function _doRemoveFromRoot():Void
 	{
-		if(name != null)
-			core.root.clearCachedChild(parent.fullName + name);
+		if(_isCachedByFullName && name != null)
+			core.root.clearCachedChild(parent.fullName + Path.TO_COMPONENT + name);
 			
 		_isAddedToRoot = false;
 	}

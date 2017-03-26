@@ -70,7 +70,7 @@ class EntityRootTests extends TestCase
 		assert.equal(finded, gunEntity, "gun is not found");
 		
 
-		finded =  link.findChild();
+		finded =  link.find();
 		assert.equal(finded, cmp, "comp should be found by link");
 
 		var gunFullName = gunEntity.fullName;

@@ -10,7 +10,7 @@ import sorcery.core.interfaces.IEntityChildLink;
 import sorcery.core.interfaces.ILinkInternal;
 import haxecontracts.Contract;
 import haxecontracts.HaxeContracts;
-
+import sorcery.macros.Nullsafety.*;
 /**
  * ...
  * @author Dmitriy Kolyesnik
@@ -53,9 +53,14 @@ class EntityChildLink implements IEntityChildLink implements ILinkInternal imple
 	}
 	/* INTERFACE bgcore.interfaces.IEntityChildLink */
 
-	public function findChild():IEntityChild
+	public function find():IEntityChild
 	{
 		return _owner.core.root.findChildByFullName(fullName);
+	}
+	
+	public function findAs<T>(cl:Class<T>):T
+	{
+		return safeGet((_owner.core.root.findChildByFullName(fullName)).castTo(cl));
 	}
 
 }

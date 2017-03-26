@@ -1,11 +1,11 @@
 package sorcery.core.tools;
 import sorcery.core.Event;
+import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.IEntityChild;
-import sorcery.core.CoreNames;
 import sorcery.core.interfaces.IEntityRoot;
 import sorcery.core.interfaces.IComponent;
-
+import sorcery.macros.Nullsafety.*;
 /**
  * ...
  * @author Dmitriy Kolyesnik
@@ -28,12 +28,9 @@ class EntityTools
 		return null;
 	}
 	
-	public static function findComponent<T:IComponent>(entity:IEntity, componentName:String):T
+	public static function removeFromParent(child:IEntityChild):Void
 	{
-		var comp = entity.findChild(componentName);
-		if (comp != null)
-			return cast comp;
-		return null;
+		safeCall(child.parent.removeChild(child));
 	}
 	
 	public static function sendEventTo(entityRoot:IEntityRoot, event:Event, targetFullName:String):Void
@@ -48,7 +45,7 @@ class EntityTools
 	
 	public static function checkWhetherChildCanBeAdded(entity:IEntity, child:IEntityChild):Bool
 	{
-		if (child.name == CoreNames.ROOT)
+		if (child.name == Path.ROOT)
 		{
 			trace("Error: can't add root as a child");
 			return false;
@@ -57,7 +54,7 @@ class EntityTools
 		if (child.isEntity())
 		{
 			var parent = entity.parent;
-			while (parent != null && parent.name != CoreNames.ROOT)
+			while (parent != null && parent.name != Path.ROOT)
 			{
 				if (parent == child)
 				{

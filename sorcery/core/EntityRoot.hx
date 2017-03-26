@@ -4,7 +4,6 @@
 package sorcery.core;
 
 import sorcery.core.abstracts.Path;
-import sorcery.core.CoreNames;
 import sorcery.core.abstracts.EntityName;
 import sorcery.core.abstracts.FullName;
 import sorcery.core.interfaces.IComponent;
@@ -20,6 +19,8 @@ import sorcery.core.interfaces.ISystemNode;
 import sorcery.core.misc.NodeList;
 import haxecontracts.Contract;
 import haxecontracts.HaxeContracts;
+import sorcery.core.abstracts.Path.*;
+import sorcery.macros.Nullsafety.*;
 
 class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContracts
 {
@@ -30,10 +31,10 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 	public function new(p_core:ICore)
 	{
 		Contract.requires(p_core != null);
-		Contract.ensures(name == CoreNames.ROOT);
+		Contract.ensures(name == ROOT);
 		
 		_wrappedEntity = new EntityForRoot(p_core);
-		_wrappedEntity.setName(CoreNames.ROOT);
+		_wrappedEntity.setName(ROOT);
 		super(_wrappedEntity);
 	}
 	
@@ -84,6 +85,7 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 			if (child != null)
 			{
 				childrenByFullName[p_name] = child;
+				child.onCachedByFullName();
 				return child;
 			}
 		}
@@ -94,7 +96,7 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 	{
 		if (p_name == null || p_name == "")
 			return null;
-		if (p_name == CoreNames.ROOT)
+		if (p_name == ROOT)
 			return this;
 
 		//TODO optimize
@@ -102,13 +104,13 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 		var entityName = "";
 		var entity:IEntity;
 		var gr:IEntityGroup = this;
-		if (p_name.charAt(1) == Path.TO_COMPONENT)
+		if (p_name.charAt(1) == TO_COMPONENT)
 			return findChild(p_name.substr(2));
 			
 		for (i in 2...p_name.length)
 		{
 			var c = p_name.charAt(i);
-			if (c == Path.TO_GROUP)
+			if (c == TO_GROUP)
 			{
 				entity = gr.findEntity(entityName);
 				if (entity == null)
@@ -119,10 +121,10 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 					return entity;
 				entityName = "";
 			}
-			else if (c == Path.TO_COMPONENT)
+			else if (c == TO_COMPONENT)
 			{
 				entity = gr.findEntity(entityName);
-				return entity.findChild(p_name.substr(i + 1));
+				return safeGet(entity.findChild(p_name.substr(i + 1)));
 			}
 			else
 			{
@@ -169,7 +171,7 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 	
 	override function get_fullName():String 
 	{
-		return CoreNames.ROOT;
+		return ROOT;
 	}
 }
 
@@ -179,7 +181,7 @@ private class EntityForRoot extends Entity
 	{
 		super(p_core);
 		_isAddedToRoot = true;
-		name = CoreNames.ROOT;
+		name = ROOT;
 	}
 
 	override public function setName(p_name:String):IEntityChild

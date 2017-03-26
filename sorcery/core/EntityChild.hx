@@ -1,7 +1,7 @@
 package sorcery.core;
 import sorcery.core.BaseAgenda;
-import sorcery.core.CoreNames;
 import sorcery.core.abstracts.Agenda;
+import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.IEntity;
 import haxecontracts.Contract;
 import haxecontracts.HaxeContracts;
@@ -19,6 +19,7 @@ class EntityChild implements IEntityChild implements HaxeContracts
 	var _isActivated = false;
 	var _isAddedToRoot = false;
 	var _isFocused = false;
+	var _isCachedByFullName = false;
 	var _agendas:Map<String, Bool>;
 	var _useByAgendaCount = 0;
 	
@@ -68,6 +69,12 @@ class EntityChild implements IEntityChild implements HaxeContracts
 		return _isAddedToRoot;
 	}
 	
+	@:noCompletion
+	public function onCachedByFullName():Void
+	{
+		_isCachedByFullName = true;
+	}
+	
 	public function asEntity():IEntity
 	{
 		return null;
@@ -83,7 +90,7 @@ class EntityChild implements IEntityChild implements HaxeContracts
 
 	public function setName(p_name:String):IEntityChild
 	{
-		Contract.requires(p_name != CoreNames.ROOT && p_name != "");
+		Contract.requires(p_name != Path.ROOT && p_name != "");
 		Contract.requires( parent == null || name == p_name);
 		
 		if (parent == null)
@@ -99,8 +106,6 @@ class EntityChild implements IEntityChild implements HaxeContracts
 
 	}
 	
-	
-
 	public function hasAgenda(p_agenda:String):Bool
 	{
 		Contract.requires(Agenda.validate(p_agenda));
@@ -242,6 +247,7 @@ class EntityChild implements IEntityChild implements HaxeContracts
 		_useByAgendaCount = 0;
 		parent = null;
 	}
+	
 	@:noCompletion
 	function addToRoot():Void
 	{

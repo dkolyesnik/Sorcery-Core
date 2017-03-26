@@ -6,5 +6,6 @@ package sorcery.core.interfaces;
 interface IEntityChildLink 
 {
 	var fullName(get, null):String;
-	function findChild():IEntityChild;
+	function find():IEntityChild;
+	function findAs<T>(cl:Class<T>):T;
 }

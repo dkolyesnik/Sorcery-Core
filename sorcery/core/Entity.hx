@@ -282,7 +282,6 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 				if (childEntity != null)
 					childEntity.removeFromGroup();
 			}
-
 		}
 	}
 
@@ -369,8 +368,10 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 			if (child.isAddedToRoot())
 				child.removeFromRoot();
 
+		if(_isCachedByFullName)
+			core.root.clearCachedChild(fullName);
+			
 		_isAddedToRoot = false;
-		core.root.clearCachedChild(fullName);
 
 		if (!isWrapped())
 			removeFromGroup();
