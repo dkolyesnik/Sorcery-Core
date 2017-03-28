@@ -5,6 +5,7 @@ import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.IEntity;
 import haxecontracts.Contract;
 import haxecontracts.HaxeContracts;
+import sorcery.core.macros.interfaces.IInjectArguments;
 
 import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.IEntityChild;
@@ -13,7 +14,7 @@ import sorcery.core.interfaces.IEntityChild;
  * ...
  * @author Dmitriy Kolyesnik
  */
-class EntityChild implements IEntityChild implements HaxeContracts
+class EntityChild implements IEntityChild implements HaxeContracts implements IInjectArguments
 {
 	//var _isActivatedByParent = false;
 	var _isActivated = false;

@@ -28,6 +28,12 @@ class EntityTools
 		return null;
 	}
 	
+	public static function removeChildByName(entity:IEntity, childName:String):IEntityChild
+	{
+		var child = entity.findChild(childName);
+		return child != null ? entity.removeChild(child) : null;
+	}
+	
 	public static function removeFromParent(child:IEntityChild):Void
 	{
 		safeCall(child.parent.removeChild(child));
