@@ -1,7 +1,6 @@
 package sorcery.core.tests.buddy;
 import buddy.reporting.TraceReporter.Color;
 import haxe.CallStack.StackItem;
-import sorcery.framework.common.view.ColorRGB;
 
 import buddy.BuddySuite.Spec;
 import buddy.BuddySuite.Suite;

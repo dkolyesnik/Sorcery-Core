@@ -1,7 +1,6 @@
 package sorcery.core.tests.hunit;
 import haxe.unit.TestCase;
 import sorcery.macros.Nullsafety.*;
-import sorcery.core.macros.NullsafetyTests.B;
 import thx.Assert.*;
 /**
  * ...

@@ -171,7 +171,7 @@ class SystemNodeBuildMacro
 				access:[APublic, AOverride],
 				kind:FieldType.FFun({
 					args:[],
-					expr: $b{unprepareExprArray},
+					expr: macro $b{unprepareExprArray},
 					ret: macro: Void
 				}),
 				pos:Context.currentPos()
@@ -207,7 +207,7 @@ class SystemNodeBuildMacro
 			else
 				createLinksExpr.push(macro { $i{linkName} = createLink($v{path}); });
 				
-			prepareExprArray.push(macro $i{varName} = cast $i{linkName}.findChild());
+			prepareExprArray.push(macro $i{varName} = cast $i{linkName}.find());
 			prepareExprArray.push(macro temp = $i{varName} != null && temp);
 			
 			unprepareExprArray.push(macro $i{varName} = null);
