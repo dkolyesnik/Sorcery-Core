@@ -1,1 +1,1 @@
-@:sorcery_node("$(EntryPoint)", true)
+@:sorcery_node($(EntryPoint), true)

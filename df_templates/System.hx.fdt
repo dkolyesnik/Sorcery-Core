@@ -1,5 +1,5 @@
 package $(Package);
-
+import sorcery.core.interfaces.ICore;
 import sorcery.core.BaseSystem;
 import sorcery.core.CoreEvent;
 
