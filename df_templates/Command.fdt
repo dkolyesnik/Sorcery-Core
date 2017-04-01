@@ -1,0 +1,26 @@
+package $(Package);
+import sorcery.core.abstracts.EventType.EventType<T>;
+import sorcery.core.abstracts.Priority;
+import sorcery.core.Command;
+
+/**
+$(CBI)* ...
+$(CBI)* @author $(DefaultUser)
+$(CBI)*/
+class $(FileName) extends Command<T> $(CSLB){
+/*
+	mark fiels with metadata, true if requred
+	if requred field is null, command is not executed
+	@:sorcery_inject("path", true)
+*/
+	public function new(p_type:EventType<T>, p_priority:Priority=0) 
+	{
+		super(p_type, p_priority);
+		
+	}
+	
+	override function execute(e:T):Void 
+	{
+		super.execute(e);
+	}
+}

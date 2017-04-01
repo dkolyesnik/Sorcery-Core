@@ -1,0 +1,1 @@
+@:sorcery_inject("$(EntryPoint)", true)
