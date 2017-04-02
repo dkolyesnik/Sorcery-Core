@@ -22,7 +22,7 @@ interface IEntityChild extends IAgendaChild
 	function asEntity():IEntity;
 
 	function setName(p_name : String) : IEntityChild;
-	function castTo<T>(cl:Class<T>):T;
+	//function castTo<T>(cl:Class<T>):T;
 
 	function destroy() : Void;
 

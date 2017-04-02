@@ -1,5 +1,4 @@
 package sorcery.core.interfaces;
-
 /**
  * @author Dmitriy Kolyesnik
  */

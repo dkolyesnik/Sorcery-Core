@@ -6,6 +6,7 @@ import sorcery.core.interfaces.IEntityChild;
 import sorcery.core.interfaces.IEntityRoot;
 import sorcery.core.interfaces.IComponent;
 import sorcery.macros.Nullsafety.*;
+using sorcery.core.tools.EntityChildTools;
 /**
  * ...
  * @author Dmitriy Kolyesnik
@@ -30,7 +31,7 @@ class EntityTools
 	
 	public static function findChildAs<T>(entity:IEntity, childName:String, cl:Class<T>):T
 	{
-		safeGet((entity.findChild(childName)).castTo(cl));
+		return safeGet((entity.findChild(childName)).castTo(cl));
 	}
 	
 	public static function removeChildByName(entity:IEntity, childName:String):IEntityChild

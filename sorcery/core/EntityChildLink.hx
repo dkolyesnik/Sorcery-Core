@@ -11,6 +11,7 @@ import sorcery.core.interfaces.ILinkInternal;
 import haxecontracts.Contract;
 import haxecontracts.HaxeContracts;
 import sorcery.macros.Nullsafety.*;
+using sorcery.core.tools.EntityChildTools;
 /**
  * ...
  * @author Dmitriy Kolyesnik
