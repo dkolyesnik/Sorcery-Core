@@ -12,7 +12,7 @@ using haxe.macro.ExprTools;
 #if macro
 typedef PrepData = {
 	varName:String,
-	linkPath:String
+	linkPath:Expr
 }
 
 class SystemNodeBuildMacro
@@ -44,12 +44,12 @@ class SystemNodeBuildMacro
 				{
 					if (meta.name == medataName && meta.params != null && meta.params.length > 0)
 					{
-						linkPath = meta.params[0].getValue();
+						linkPath = meta.params[0];
 						log('field with meta is found, link path = $linkPath');
 					}
 				}
 			}
-			if (linkPath != null && linkPath != "")
+			if (linkPath != null)
 			{
 				switch(field.kind)
 				{
@@ -199,13 +199,13 @@ class SystemNodeBuildMacro
 				pos:Context.currentPos(),
 				meta:[{name:":noCompletion", pos:Context.currentPos()}]
 			});
-			if (path.charAt(0) == "-")
-			{
-				var pathVar = path.substr(1);
-				createLinksExpr.push(macro { $i{linkName} = createLink($i{pathVar}); });
-			}
-			else
-				createLinksExpr.push(macro { $i{linkName} = createLink($v{path}); });
+			//if (path.charAt(0) == "-")
+			//{
+				//var pathVar = path.substr(1);
+				//createLinksExpr.push(macro { $i{linkName} = createLink($i{pathVar}); });
+			//}
+			//else
+				createLinksExpr.push(macro { $i{linkName} = createLink($path); });
 				
 			prepareExprArray.push(macro $i{varName} = cast $i{linkName}.find());
 			prepareExprArray.push(macro temp = $i{varName} != null && temp);

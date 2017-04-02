@@ -28,6 +28,11 @@ class EntityTools
 		return null;
 	}
 	
+	public static function findChildAs<T>(entity:IEntity, childName:String, cl:Class<T>):T
+	{
+		safeGet((entity.findChild(childName)).castTo(cl));
+	}
+	
 	public static function removeChildByName(entity:IEntity, childName:String):IEntityChild
 	{
 		var child = entity.findChild(childName);

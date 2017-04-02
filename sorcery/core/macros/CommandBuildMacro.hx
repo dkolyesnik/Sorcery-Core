@@ -56,7 +56,7 @@ class CommandBuildMacro
 				if (m.params == null || m.params.length == 0)
 					throw 'Error: not enough metadata params for field $f in class ${builder.localClass.name}';
 					
-				var path = m.params[0].getValue();
+				var path = m.params[0];
 				var required = m.params.length == 2 ? m.params[1] : macro false;
 				var linkFieldName = "__link_" + f.name;
 				builder.addField({
@@ -79,7 +79,7 @@ class CommandBuildMacro
 					
 				});
 				unprepareExpr.push(macro $i{f.name} = null);
-				createLinksExpr.push(macro  $i{linkFieldName} = _manager.getLink($v{path}) );
+				createLinksExpr.push(macro  $i{linkFieldName} = _manager.getLink($path) );
 				clearLinksExpr.push(macro _manager.returnLink($i{linkFieldName}));
 				clearLinksExpr.push(macro $i{linkFieldName} = null );
 				
@@ -167,7 +167,6 @@ class CommandBuildMacro
 						meta: []
 				});
 		}
-		trace(ExprTools.toString(macro $b{unprepareExpr}));
 		return builder.export();
 	}
 	

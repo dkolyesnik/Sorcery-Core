@@ -10,7 +10,7 @@ using haxe.macro.ExprTools;
  * @author Dmitriy Kolyesnik
  */
 #if macro
-typedef Node = {varName:String, nodeType:TypeParam, nodeName:String, needToPrepare:Bool};
+typedef Node = {varName:String, nodeType:TypeParam, nodeName:Expr, needToPrepare:Bool};
 class BaseSystemBuildMacro
 {
 	static var _metadataName = ":sorcery_node";
@@ -33,9 +33,9 @@ class BaseSystemBuildMacro
 		var releaseNodesFunc:Field;
 		var typeName;
 		
-		var findNode = function (t:Null<ComplexType>, e:Null<Expr>, f:Field, nodeName:String, prepare:Bool)
+		var findNode = function (t:Null<ComplexType>, e:Null<Expr>, f:Field, nodeName:Expr, prepare:Bool)
 		{
-			if (t != null && nodeName != "")
+			if (t != null && nodeName != null)
 			{
 				switch(t) 
 				{
@@ -58,7 +58,7 @@ class BaseSystemBuildMacro
 		for (f in fields)
 		{
 			log("		took field " + f.name);
-			var nodeName = "";
+			var nodeName:Expr = null;
 			var needToPrepare = false;
 			if (f.meta != null)
 			{
@@ -68,7 +68,9 @@ class BaseSystemBuildMacro
 					log("				meta name = " + m.name);
 					if (m.name == ":sorcery_node")
 					{
-						nodeName = m.params.length > 0 ? m.params[0].getValue() : "";
+ 						if (m.params.length == 0 || m.params[0] == null)
+							throw "Error 73 TODO";
+						nodeName = m.params[0];
 						log('					param = $nodeName');
 						needToPrepare = m.params.length > 1 ? m.params[1].getValue():false;
 						log('					param = $needToPrepare');
@@ -112,26 +114,26 @@ class BaseSystemBuildMacro
 		for (n in nodes)
 		{
 			var vn:String = n.varName;
-			var nn:String = n.nodeName;
+			var nn:Expr = n.nodeName;
 			var typePath:TypePath = {name: nodeListLinkClass, pack: nodeListLinkPackage, params:[n.nodeType]};
 			var className = n.needToPrepare ? "PrepearingNodeIterator" : "NodeIterator";
 			var iteratorTypePath:TypePath = {name: className, pack:nodeListLinkPackage, params:[n.nodeType] };
 			exprArrayCreateNodes.push(macro { 
 										$i{vn} = new $typePath(new $iteratorTypePath()); 
 									} );
-			if (nn.charAt(0) == "-") //it's a var name and not node name
-			{
-				var varName = nn.substr(1);
+			//if (nn.charAt(0) == "-") //it's a var name and not node name
+			//{
+				//var varName = nn.substr(1);
+				//exprArrayGetNodes.push(macro {
+										//$i{vn}.setNodeList(core.root.getNodes($i{varName}));
+										//} );
+			//}
+			//else
+			//{
 				exprArrayGetNodes.push(macro {
-										$i{vn}.setNodeList(core.root.getNodes($i{varName}));
-										} );
-			}
-			else
-			{
-				exprArrayGetNodes.push(macro {
-										$i{vn}.setNodeList(core.root.getNodes($v{nn}));
+										$i{vn}.setNodeList(core.root.getNodes($nn));
 									} );
-			}
+			//}
 			exprArrayReleaseNodes.push(macro {
 										$i{vn}.releaseNodeList();
 									} );
