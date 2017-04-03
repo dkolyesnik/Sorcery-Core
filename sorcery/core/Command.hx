@@ -5,6 +5,7 @@ import sorcery.core.abstracts.EventType;
 import sorcery.core.abstracts.Priority;
 import sorcery.core.interfaces.ICommand;
 import sorcery.core.interfaces.ICommandManager;
+import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.IEntityChildLink;
 import sorcery.core.interfaces.IEvent;
 import sorcery.core.macros.CommandBuildMacro;
@@ -16,6 +17,7 @@ import sorcery.core.macros.CommandBuildMacro;
 @:autoBuild(sorcery.core.macros.CommandBuildMacro.build())
 class Command<T:IEvent> extends HandlerData implements ICommand
 {
+	var core(get, never):ICore;
 	var _manager:ICommandManager;
 	public function new(p_type:EventType<T>, p_priority:Priority=0) 
 	{
@@ -59,6 +61,11 @@ class Command<T:IEvent> extends HandlerData implements ICommand
 	function _returnLinks():Void
 	{
 		
+	}
+	
+	function get_core():ICore 
+	{
+		return _manager.;
 	}
 	
 }

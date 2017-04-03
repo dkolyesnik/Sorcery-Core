@@ -45,4 +45,12 @@ class NodeListLink<T:SystemNode>
 	{
 		_iterator.addOnRemovedCallback(callback);
 	}
+	
+	public function removeOnAddedCallback():Void{
+		_iterator.removeOnAddedCallback();
+	}
+	
+	public function removeOnRemoveCallback():Void{
+		_iterator.removeOnRemovedCallback();
+	}
 }

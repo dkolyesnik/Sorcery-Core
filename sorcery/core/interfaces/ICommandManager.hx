@@ -6,8 +6,9 @@ import sorcery.core.abstracts.Path;
  */
 interface ICommandManager 
 {
-	function addCommand(command:ICommand):ICommand;
+	var core(get, null):ICore;
 	
+	function addCommand(command:ICommand):ICommand;
 	@:allow(sorcery.core.interfaces.ICommand)
 	private function getLink(path:Path):IEntityChildLink;
 	@:allow(sorcery.core.interfaces.ICommand)

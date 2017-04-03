@@ -138,6 +138,16 @@ class NodeIterator<T:ISystemNode> implements INodeIterator implements HaxeContra
 	{
 		_onRemoveCallback = callback;
 	}
+	
+	public function removeOnAddedCallback() 
+	{
+		_onAddCallback = null;
+	}
+	
+	public function removeOnRemovedCallback()
+	{
+		_onRemoveCallback = null;
+	}
 
 	function onRemoved(node:ISystemNode):Void
 	{
