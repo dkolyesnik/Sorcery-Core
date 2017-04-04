@@ -25,7 +25,7 @@ import sorcery.core.interfaces.IPool;
 import sorcery.core.interfaces.IPoolable;
 
 using sorcery.core.tools.EntityTools;
-
+using sorcery.core.utils.ArrayUtils;
 /**
  * Basic object, can have children GameObjects and components
  */
@@ -282,6 +282,14 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 				if (childEntity != null)
 					childEntity.removeFromGroup();
 			}
+		}
+	}
+	
+	public function removeAllChildren():Void{
+		//OPT
+		while (_children.length > 0)
+		{
+			removeChild(_children.last());
 		}
 	}
 

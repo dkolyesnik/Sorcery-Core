@@ -200,6 +200,11 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 	{
 		return _wrappedEntity.removeChild(child);
 	}
+	
+	public function removeAllChildren():Void
+	{
+		_wrappedEntity.removeAllChildren();
+	}
 
 	public function findChild(p_name : String) : IEntityChild
 	{
