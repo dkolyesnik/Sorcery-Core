@@ -56,7 +56,7 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 	// ==============================================================================
 	public function findEntity(p_name : String) : IEntity
 	{
-		Contract.requires(EntityName.validate(p_name) || (p_name == Path.ROOT && _wrappedEntity.name == CoreNames.ROOT));
+		Contract.requires(EntityName.validate(p_name) || (p_name == Path.ROOT && _wrappedEntity.name == Path.ROOT));
 		
 		return _entitiesByName[p_name];
 	}

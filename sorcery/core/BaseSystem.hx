@@ -1,4 +1,5 @@
 package sorcery.core;
+import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.ISystem;
@@ -24,7 +25,7 @@ class BaseSystem extends Behavior implements ISystem implements HaxeContracts
 	
 	override function addToParent(p_parent:IEntity):Void 
 	{
-		Contract.requires(p_parent.name == CoreNames.ROOT);
+		//Contract.requires(p_parent.name == Path.ROOT);
 		
 		super.addToParent(p_parent);
 	}

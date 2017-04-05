@@ -6,7 +6,7 @@ package sorcery.core.abstracts;
  */
 abstract EntityName(String) from String to String
 {
-	inline public static var EREG = "[A-Z0-9]+";
+	inline public static var EREG = "[A-Z_0-9]+";
 	
 	inline public function new(value:String)
 	{

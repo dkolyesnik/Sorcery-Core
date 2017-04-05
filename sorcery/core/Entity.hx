@@ -61,7 +61,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	public function new(p_core:ICore)
 	{
 		Contract.requires(p_core != null);
-		Contract.ensures(core == p_core && _isActived == _isAddedToRoot == _isDestroyed == false);
+		Contract.ensures(core == p_core && _isActivated == _isAddedToRoot == _isDestroyed == false);
 
 		super(p_core);
 		_isDestroyed = false;
@@ -109,8 +109,6 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 
 	function get_fullName():String
 	{
-		Contract.ensures(Contract.result == null || FullName.validate(Contract.result));
-
 		if (_isAddedToRoot)
 			return group.fullName + "." + name;
 		else
@@ -237,7 +235,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		Contract.requires(child != null);
 		Contract.requires(child.parent == this);
 		Contract.ensures(_children.indexOf(child) == -1);
-		Contract.ensures(child.parent == null && child.isActivatedByParent() == false && child.isActive() == false && child.isAddedToRoot() == false);
+		Contract.ensures(child.parent == null && child.isActivated() == false && child.isAddedToRoot() == false);
 
 		if (child.parent == this)
 		{

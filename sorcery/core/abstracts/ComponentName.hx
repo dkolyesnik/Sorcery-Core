@@ -7,7 +7,7 @@ package sorcery.core.abstracts;
 abstract ComponentName(String) from String to String
 {
 	//inline public static var PREFIX = "$";
-	inline public static var EREG = "[A-Z][A-Z0-9]*";
+	inline public static var EREG = "[A-Z_][_A-Z0-9]*";
 	
 	inline public function new(value:String)
 	{

@@ -199,7 +199,6 @@ class EntityChild implements IEntityChild implements HaxeContracts implements II
 	function deactivateByAgends(p_agenda:Agenda):Bool
 	{
 		Contract.requires(Agenda.validate(p_agenda));
-		Contract.ensures(_useByAgendaCount >= 0);
 		
 		if (_agendas == null)
 		{
