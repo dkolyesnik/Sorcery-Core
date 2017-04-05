@@ -58,6 +58,14 @@ class NodeList
 	{
 		length--;
 		onRemoveEmitter.emit(node);
+		
+		if (head == node){
+			head = node.next;
+		}
+		if (end == node){
+			end = node.prev;
+		}
+		
 		if (node.prev != null)
 			node.prev.next = node.next;
 		if (node.next != null)
