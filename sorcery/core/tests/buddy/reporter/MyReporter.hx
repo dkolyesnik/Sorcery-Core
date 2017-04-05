@@ -1,4 +1,4 @@
-package sorcery.core.tests.buddy;
+package sorcery.core.tests.buddy.reporter;
 import buddy.reporting.TraceReporter.Color;
 import haxe.CallStack.StackItem;
 

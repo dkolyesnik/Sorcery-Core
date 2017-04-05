@@ -65,7 +65,7 @@ class Command<T:IEvent> extends HandlerData implements ICommand
 	
 	function get_core():ICore 
 	{
-		return _manager.;
+		return _manager.core;
 	}
 	
 }

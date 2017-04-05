@@ -12,6 +12,7 @@ import sorcery.core.abstracts.Signal;
 @:allow(sorcery.core.interfaces.INodeIterator)
 class NodeList
 {
+	public var length(default, null):Int;
 	var head(default,null):ISystemNode;
 	var end(default, null):ISystemNode;
 	var onAddEmitter:SignalEmitter<ISystemNode>;
@@ -30,6 +31,7 @@ class NodeList
 	
 	public function new()
 	{
+		length = 0;
 		onAddEmitter = new SignalEmitter<ISystemNode>();
 		onRemoveEmitter = new SignalEmitter<ISystemNode>();
 	}
@@ -48,11 +50,13 @@ class NodeList
 			end = node;
 		}
 		node.list = this;
+		length++;
 		onAddEmitter.emit(node);
 	}
 
 	public function remove(node:ISystemNode):Void
 	{
+		length--;
 		onRemoveEmitter.emit(node);
 		if (node.prev != null)
 			node.prev.next = node.next;

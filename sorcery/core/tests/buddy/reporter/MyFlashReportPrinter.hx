@@ -1,4 +1,4 @@
-package sorcery.core.tests.buddy;
+package sorcery.core.tests.buddy.reporter;
 import flash.Lib;
 import flash.events.Event;
 import flash.text.TextField;

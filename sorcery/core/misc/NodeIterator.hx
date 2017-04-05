@@ -15,6 +15,7 @@ import haxecontracts.HaxeContracts;
 @:generic
 class NodeIterator<T:ISystemNode> implements INodeIterator implements HaxeContracts
 {
+	public var length(get,never):Int;
 	var current:T;
 	var list:NodeList;
 	var _skipIteration:Bool;
@@ -38,7 +39,7 @@ class NodeIterator<T:ISystemNode> implements INodeIterator implements HaxeContra
 			_start();
 			while (_hasNext())
 			{
-				var node = _next();
+				var node = next();
 				_onAddCallback(node);
 			}
 		}
@@ -52,7 +53,7 @@ class NodeIterator<T:ISystemNode> implements INodeIterator implements HaxeContra
 			_start();
 			while(_hasNext())
 			{
-				var node = _next();
+				var node = next();
 				_onRemoveCallback(node);
 			}
 		}
@@ -92,11 +93,11 @@ class NodeIterator<T:ISystemNode> implements INodeIterator implements HaxeContra
 	{
 		return cast current;
 	}
-	
-	function _next():T
-	{
-		return cast current;
-	}
+	//
+	//function _next():T
+	//{
+		//return cast current;
+	//}
 
 	public function hasNext():Bool
 	{
@@ -169,6 +170,11 @@ class NodeIterator<T:ISystemNode> implements INodeIterator implements HaxeContra
 		if (_onAddCallback != null)
 			_onAddCallback(cast node);
 		
+	}
+	
+	function get_length():Int 
+	{
+		return list.length;
 	}
 }
 

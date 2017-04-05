@@ -9,6 +9,7 @@ import sorcery.core.SystemNode;
 @:generic
 class NodeListLink<T:SystemNode>
 {
+	public var length(get, never):Int;
 	var _iterator:NodeIterator<T>;
 	public function new(p_iterator:NodeIterator<T>) 
 	{
@@ -52,5 +53,10 @@ class NodeListLink<T:SystemNode>
 	
 	public function removeOnRemoveCallback():Void{
 		_iterator.removeOnRemovedCallback();
+	}
+	
+	function get_length():Int 
+	{
+		return _iterator.length;
 	}
 }
