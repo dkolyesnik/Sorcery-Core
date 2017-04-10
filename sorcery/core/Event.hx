@@ -10,7 +10,7 @@ class Event implements IEvent
 {
     public var type(get, never) : String;
 
-    private var _type : String;
+    var _type : String;
     
     public function new(p_type : String)
     {

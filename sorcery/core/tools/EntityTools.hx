@@ -1,5 +1,6 @@
 package sorcery.core.tools;
 import sorcery.core.Event;
+import sorcery.core.abstracts.FullName;
 import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.IEntityChild;
@@ -43,16 +44,6 @@ class EntityTools
 	public static function removeFromParent(child:IEntityChild):Void
 	{
 		safeCall(child.parent.removeChild(child));
-	}
-	
-	public static function sendEventTo(entityRoot:IEntityRoot, event:Event, targetFullName:String):Void
-	{
-		var child = entityRoot.findChildByFullName(targetFullName);
-		if (child != null && child.isEntity())
-		{
-			var target:IEntity = cast child;
-			target.sendEvent(event);
-		}
 	}
 	
 	public static function checkWhetherChildCanBeAdded(entity:IEntity, child:IEntityChild):Bool
@@ -119,4 +110,8 @@ class EntityTools
 		}
 	}
 
+	inline public static function sendEventTo(entity:IEntity, e:Event, targetFullName:FullName):Void
+	{
+		safeCall((entity.core.root.findChildByFullName(targetFullName)).asEntity().sendEvent(e));
+	}
 }
