@@ -81,6 +81,11 @@ class EntityTools
 		//TODO check for adding to oun children
 	}
 	
+	public static function addChildT<T:IEntityChild>(entity:IEntity, child:T):T
+	{
+		entity.addChild(child);
+		return child;
+	}
 
 	public static function replace(entity:IEntity, child:IEntityChild):IEntityChild
 	{

@@ -10,4 +10,5 @@ interface IParent
 	function removeChild(child : IEntityChild) : IEntityChild;
 	function findChild(p_name : String) : IEntityChild;
 	function removeAllChildren():Void;
+	function iterator():Iterator<IEntityChild>;
 }

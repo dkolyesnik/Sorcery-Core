@@ -165,7 +165,8 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 	{
 		Contract.ensures(parentGroup == null);
 		
-		parentGroup.unregisterEntity(this);
+		if(parentGroup != null)
+			parentGroup.unregisterEntity(this);
 		parentGroup = null;
 	}
 
@@ -189,6 +190,11 @@ class EntityGroup implements IEntityGroup implements IEntity implements HaxeCont
 	public function isAddedToRoot() : Bool
 	{
 		return _wrappedEntity.isAddedToRoot();
+	}
+	
+	public function iterator():Iterator<IEntityChild>
+	{
+		return _wrappedEntity.iterator();
 	}
 
 	public function addChild(child : IEntityChild) : IEntityChild

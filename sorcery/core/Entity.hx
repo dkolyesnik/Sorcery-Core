@@ -145,6 +145,11 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	}
 
 	//CHILDREN
+	
+	public function iterator():Iterator<IEntityChild>
+	{
+		return _children.iterator();
+	}
 
 	public function addChild(child : IEntityChild) : IEntityChild
 	{
@@ -233,7 +238,6 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 	public function removeChild(child : IEntityChild) : IEntityChild
 	{
 		Contract.requires(child != null);
-		Contract.requires(child.parent == this);
 		Contract.ensures(_children.indexOf(child) == -1);
 		Contract.ensures(child.parent == null && child.isActivated() == false && child.isAddedToRoot() == false);
 
