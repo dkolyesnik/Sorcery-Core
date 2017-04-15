@@ -11,8 +11,7 @@ using haxe.macro.ExprTools;
  */
 #if macro
 typedef Node = {varName:String, nodeType:TypeParam, nodeName:Expr, needToPrepare:Bool};
-class BaseSystemBuildMacro
-{
+class BaseSystemBuildMacro {
 	static var _metadataName = ":sorcery_node";
 	static var _createNodesName = "_createNodeListLinks";
 	static var _getNodesName = "_getNodeLists";
@@ -20,11 +19,10 @@ class BaseSystemBuildMacro
 	static var nodeListLinkClass = "NodeListLink";
 	static var baseSystemClass = "BaseSystem";
 	static var nodeListLinkPackage = ["sorcery", "core", "misc"];
-	
-	static public macro function build():Array<Field>
-	{
+
+	static public macro function build():Array<Field> {
 		log("processing "+ Context.getLocalClass().get().name);
-		
+
 		var fields = Context.getBuildFields();
 		//TODO find fiels with NodeListLinks, add initialization, getting NodeLists and clearing NodeLists
 		var nodes:Array<Node> = [];
@@ -32,43 +30,35 @@ class BaseSystemBuildMacro
 		var getNodesFunc:Field;
 		var releaseNodesFunc:Field;
 		var typeName;
-		
-		var findNode = function (t:Null<ComplexType>, e:Null<Expr>, f:Field, nodeName:Expr, prepare:Bool)
-		{
-			if (t != null && nodeName != null)
-			{
-				switch(t) 
-				{
+
+		var findNode = function (t:Null<ComplexType>, e:Null<Expr>, f:Field, nodeName:Expr, prepare:Bool) {
+			if (t != null && nodeName != null) {
+				switch (t) {
 					case ComplexType.TPath(p):
-						if (p.name == nodeListLinkClass && p.params != null && p.params.length > 0)
-						{
+						if (p.name == nodeListLinkClass && p.params != null && p.params.length > 0) {
 							nodes.push ( {
-									varName: f.name,
-									nodeType: p.params[0],
-									nodeName: nodeName,
-									needToPrepare: prepare
-								});
+								varName: f.name,
+								nodeType: p.params[0],
+								nodeName: nodeName,
+								needToPrepare: prepare
+							});
 							log("			node created " + nodes[nodes.length - 1]);
 						}
 					default:
 				}
 			}
 		}
-		
-		for (f in fields)
-		{
+
+		for (f in fields) {
 			log("		took field " + f.name);
 			var nodeName:Expr = null;
 			var needToPrepare = false;
-			if (f.meta != null)
-			{
+			if (f.meta != null) {
 				log("			has meta");
-				for (m in f.meta)
-				{
+				for (m in f.meta) {
 					log("				meta name = " + m.name);
-					if (m.name == ":sorcery_node")
-					{
- 						if (m.params.length == 0 || m.params[0] == null)
+					if (m.name == ":sorcery_node") {
+						if (m.params.length == 0 || m.params[0] == null)
 							throw "Error 73 TODO";
 						nodeName = m.params[0];
 						log('					param = $nodeName');
@@ -77,75 +67,56 @@ class BaseSystemBuildMacro
 					}
 				}
 			}
-			switch(f.kind)
-			{
+			switch (f.kind) {
 				case FieldType.FVar(t, e):
 					findNode(t, e, f, nodeName, needToPrepare);
 				case FieldType.FProp(_, _, t, e):
 					findNode(t, e, f, nodeName, needToPrepare);
 				case FieldType.FFun(func):
-					if (f.name == _createNodesName)
-					{
+					if (f.name == _createNodesName) {
 						log("=== create func found ==="+f.name);
 						createNodesFunc = f;
-					}
-					else if (f.name == _getNodesName)
-					{
+					} else if (f.name == _getNodesName) {
 						log("=== get func found ===");
 						getNodesFunc = f;
-					}
-					else if (f.name == _releaseNodesName)
-					{
+					} else if (f.name == _releaseNodesName) {
 						log("=== release func found ===");
-							releaseNodesFunc = f;
+						releaseNodesFunc = f;
 					}
 			}
 		}
-		if (nodes.length == 0)
-		{
+		if (nodes.length == 0) {
 			//there are no fields marked for this build macros
 			return fields;
 		}
-		
+
 		//crate array of node creation expressions
 		var exprArrayCreateNodes:Array<Expr> = [];
 		var exprArrayGetNodes:Array<Expr> = [];
 		var exprArrayReleaseNodes:Array<Expr> = [];
-		for (n in nodes)
-		{
+		for (n in nodes) {
 			var vn:String = n.varName;
 			var nn:Expr = n.nodeName;
 			var typePath:TypePath = {name: nodeListLinkClass, pack: nodeListLinkPackage, params:[n.nodeType]};
 			var className = n.needToPrepare ? "PrepearingNodeIterator" : "NodeIterator";
 			var iteratorTypePath:TypePath = {name: className, pack:nodeListLinkPackage, params:[n.nodeType] };
-			exprArrayCreateNodes.push(macro { 
-										$i{vn} = new $typePath(new $iteratorTypePath()); 
-									} );
-			//if (nn.charAt(0) == "-") //it's a var name and not node name
-			//{
-				//var varName = nn.substr(1);
-				//exprArrayGetNodes.push(macro {
-										//$i{vn}.setNodeList(core.root.getNodes($i{varName}));
-										//} );
-			//}
-			//else
-			//{
-				exprArrayGetNodes.push(macro {
-										$i{vn}.setNodeList(core.root.getNodes($nn));
-									} );
-			//}
+			exprArrayCreateNodes.push(macro {
+				$i{vn} = new $typePath(new $iteratorTypePath());
+			} );
+			exprArrayGetNodes.push(macro {
+				$i{vn} .setNodeList(core.root.getNodes($nn));
+			} );
 			exprArrayReleaseNodes.push(macro {
-										$i{vn}.releaseNodeList();
-									} );
+				$i{vn} .releaseNodeList();
+			} );
 		}
 		var needSuperCall = Context.getLocalClass().get().superClass.t.get().name != baseSystemClass;
-		
-		var generateFunction = function (fName:String, methodField:Field, exprArray:Array<Expr>){
-			if (methodField == null)
-			{
+
+		var generateFunction = function (fName:String, methodField:Field, exprArray:Array<Expr>) {
+			if (methodField == null) {
 				if (needSuperCall)
 					exprArray.insert(0, macro super.$fName());
-					
+
 				methodField = {
 					name: fName,
 					access: [AOverride, APrivate],
@@ -156,25 +127,18 @@ class BaseSystemBuildMacro
 					}),
 					pos: Context.currentPos()
 				}
-				
+
 				fields.push(methodField);
 				log('----------- func $fName added --------');
-			}
-			else
-			{
-				switch(methodField.kind)
-				{
+			} else {
+				switch (methodField.kind) {
 					case FieldType.FFun(func):
-						if (func.expr == null)
-						{
-							func.expr = macro $b{exprArray};
-						}
-						else
-						{
-							switch(func.expr.expr)
-							{
+						if (func.expr == null) {
+							func.expr = macro $b {exprArray};
+						} else {
+							switch (func.expr.expr) {
 								case ExprDef.EBlock(exprBlock):
-									for(expr in exprArray)
+									for (expr in exprArray)
 										exprBlock.push(expr);
 								default:
 							}
@@ -183,26 +147,23 @@ class BaseSystemBuildMacro
 				}
 			}
 		}
-		
+
 		generateFunction(_createNodesName, createNodesFunc, exprArrayCreateNodes);
 		generateFunction(_getNodesName, getNodesFunc, exprArrayGetNodes);
 		generateFunction(_releaseNodesName, releaseNodesFunc, exprArrayReleaseNodes);
-		
+
 		return fields;
 	}
-	
 
-	
-	static function log(msg:Dynamic)
-	{
+	static function log(msg:Dynamic) {
 		//trace(msg);
 	}
-	
+
 // ECall({ expr: EConst(CIdent("some")) }, [])
- //public static macro function test(a:ExprOf<String>, pos:Int) {
-    //var name = "charAt";
-    //return macro $e{a}.$name($v{pos});
-  //}
+//public static macro function test(a:ExprOf<String>, pos:Int) {
+	//var name = "charAt";
+	//return macro $e{a}.$name($v{pos});
+	//}
 }
 
 #end

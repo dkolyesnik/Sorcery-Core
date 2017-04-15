@@ -1,5 +1,6 @@
 package sorcery.core.misc;
 import sorcery.core.SystemNode;
+import sorcery.core.interfaces.ISystemNode;
 
 /**
  * ...
@@ -7,7 +8,7 @@ import sorcery.core.SystemNode;
  */
 
 @:generic
-class NodeListLink<T:SystemNode>
+class NodeListLink<T:ISystemNode>
 {
 	public var length(get, never):Int;
 	var _iterator:NodeIterator<T>;

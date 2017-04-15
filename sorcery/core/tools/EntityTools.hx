@@ -32,7 +32,7 @@ class EntityTools
 	
 	public static function findChildAs<T>(entity:IEntity, childName:String, cl:Class<T>):T
 	{
-		return safeGet((entity.findChild(childName)).castTo(cl));
+		return safeGet(entity.findChild(childName).castTo(cl));
 	}
 	
 	public static function removeChildByName(entity:IEntity, childName:String):IEntityChild
@@ -76,6 +76,15 @@ class EntityTools
 	{
 		entity.addChild(child);
 		return child;
+	}
+	
+	public static function addChildren(entity:IEntity, children:Array<IEntityChild>):IEntity
+	{
+		if (entity != null){
+			for (child in children)
+				entity.addChild(child);
+		}
+		return entity;
 	}
 
 	public static function replace(entity:IEntity, child:IEntityChild):IEntityChild

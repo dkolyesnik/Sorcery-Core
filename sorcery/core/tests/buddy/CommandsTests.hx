@@ -44,7 +44,10 @@ class CommandsTests extends SingleSuite
 			var gameEnt = core.allocateEntity("game");
 			gameEnt.addChild(new Component(core)).setName("comp");
 			core.root.addChild(gameEnt);
-			
+			var gr = core.wrapInGroup(core.allocateEntity("gr"));
+			var ent = core.allocateEntity("ent");
+			gr.addChild(ent);
+			core.root.addChild(gr);
 			//beforeAll({
 				//
 			//});
@@ -91,13 +94,14 @@ class CommandsTests extends SingleSuite
 				beforeEach({ 
 					this.isCalled = false; 
 				});
-				it("Should inject components from links and cast it to field type", {
-					core.root.sendEvent(new TestEvent(TestEvent.TEST2, function (c:Any){
+				it("Should inject components and entities from links and cast it to field type", {
+					core.root.sendEvent(new TestEvent(TestEvent.TEST2, function (c:Any, e:Any){
 						var testedCommand:TestCommandWithInjectedFields = cast c;
 						testedCommand.compFromGame2.should.be(compFromGame2);
 						testedCommand.compFromGame.should.be(compFromGame);
 						testedCommand.behaviorFromGame2.should.be(behaviorFromGame2);
 						testedCommand.someInterfaceFromRoot.should.be(compWithInterface);
+						testedCommand.someEntity.should.be(ent);
 					}));
 					isCalled.should.be(true);
 				});
@@ -111,7 +115,10 @@ class CommandsTests extends SingleSuite
 				
 				it("Command should be executed if field that is not requred is not injected", {
 					game2.removeChild(compFromGame2);
-					core.root.sendEvent(new TestEvent(TestEvent.TEST2, function (c:Any){
+					core.root.sendEvent(new TestEvent(TestEvent.TEST2, function (c:Any, e:Any){
+						var event = e;
+						(event != null).should.be(true);
+							
 						var testedCommand:TestCommandWithInjectedFields = cast c;
 						testedCommand.compFromGame2.should.be(null);
 						testedCommand.compFromGame.should.be(compFromGame);
@@ -121,7 +128,7 @@ class CommandsTests extends SingleSuite
 					isCalled.should.be(true);
 					game2.addChild(compFromGame2);
 					game2.removeChild(behaviorFromGame2);
-					core.root.sendEvent(new TestEvent(TestEvent.TEST2, function (c:Any){
+					core.root.sendEvent(new TestEvent(TestEvent.TEST2, function (c:Any, e:Any){
 						var testedCommand:TestCommandWithInjectedFields = cast c;
 						testedCommand.compFromGame2.should.be(compFromGame2);
 						testedCommand.compFromGame.should.be(compFromGame);
@@ -130,7 +137,7 @@ class CommandsTests extends SingleSuite
 					}));
 					isCalled.should.be(true);
 					game2.removeChild(compFromGame2);
-					core.root.sendEvent(new TestEvent(TestEvent.TEST2, function (c:Any){
+					core.root.sendEvent(new TestEvent(TestEvent.TEST2, function (c:Any, e:Any){
 						var testedCommand:TestCommandWithInjectedFields = cast c;
 						testedCommand.compFromGame2.should.be(null);
 						testedCommand.compFromGame.should.be(compFromGame);
@@ -162,8 +169,8 @@ private class TestEvent extends Event
 {
 	public static var TEST = new EventType<TestEvent>("test"); 
 	public static var TEST2 = new EventType<TestEvent>("test2"); 
-	public var testFunc:Any->Void;
-	public function new(p_type:EventType<TestEvent>, testFunc:Any->Void = null){
+	public var testFunc:Any->Any->Void;
+	public function new(p_type:EventType<TestEvent>, testFunc:Any->Any->Void = null){
 		super(p_type);
 		this.testFunc = testFunc;
 	}
@@ -182,7 +189,7 @@ private class TestCommand extends Command<TestEvent>
 	{
 		_comTests.isCalled = true;
 		if (e.testFunc != null)
-			e.testFunc(this);
+			e.testFunc(this, e);
 	}
 }
 
@@ -200,11 +207,14 @@ private class TestCommandWithInjectedFields extends TestCommand
 	@:sorcery_inject("#:compI", true)
 	public var someInterfaceFromRoot:ISomeInterface;
 	
+	@:sorcery_inject("#.gr.ent", false)
+	public var someEntity:IEntity;
+	
 	override function execute(e:TestEvent):Void 
 	{
 		_comTests.isCalled = true;
 		if (e.testFunc != null)
-			e.testFunc(this);
+			e.testFunc(this,e);
 	}
 }
 
