@@ -22,16 +22,16 @@ class Framework implements IFramework implements HaxeContracts
 	}
 	
 	/* INTERFACE IFramework */
-	public function setObj<T>(name:FrameworkObjName<T>, obj:T):Void 
+	public function setObj<T:IEntityChild>(name:FrameworkObjName<T>, obj:T):Void 
 	{
 		Contract.requires(FrameworkObjName.validate(name));
 		Contract.requires(obj != null);
 		Contract.requires(Std.is(obj, IEntityChild));
-		
+		obj.setName(name);
 		rootEntity.addChild(cast obj);
 	}
 	
-	public function getObj<T>(name:FrameworkObjName<T>):T 
+	public function getObj<T:IEntityChild>(name:FrameworkObjName<T>):T 
 	{
 		Contract.requires(FrameworkObjName.validate(name));
 		
