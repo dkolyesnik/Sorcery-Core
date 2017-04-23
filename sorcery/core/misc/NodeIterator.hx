@@ -64,19 +64,19 @@ class NodeIterator<T:ISystemNode> implements INodeIterator implements HaxeContra
 
 	public function start():Void
 	{
-		current = cast list.head;
+		current = list != null ? cast list.head : null;
 		_skipIteration = true;
 	}
 	
 	function _start():Void
 	{
-		current = cast list.head;
+		current = list != null ? cast list.head : null;
 		_skipIteration = true;
 	}
 
 	public function getFirstNode():T
 	{
-		return cast list.head;
+		return list != null ? cast list.head : null;
 	}
 
 	public function destroy():Void
@@ -103,7 +103,7 @@ class NodeIterator<T:ISystemNode> implements INodeIterator implements HaxeContra
 	{
 		if (!_skipIteration)
 		{
-			current = cast current.next;
+			current = current != null ? cast current.next : null;
 		}
 		else
 		{
@@ -116,7 +116,7 @@ class NodeIterator<T:ISystemNode> implements INodeIterator implements HaxeContra
 	{
 		if (!_skipIteration)
 		{
-			current = cast current.next;
+			current = current != null ? cast current.next : null;
 		}
 		else
 		{

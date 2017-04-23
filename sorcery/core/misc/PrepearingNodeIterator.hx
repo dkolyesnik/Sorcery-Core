@@ -20,7 +20,7 @@ class PrepearingNodeIterator<T:ISystemNode> extends NodeIterator<T>
 	
 	override public function getFirstNode():T 
 	{
-		current = cast list.head;
+		current = list != null ? cast list.head : null;
 		_findNext();
 		return cast current;
 	}
@@ -42,7 +42,7 @@ class PrepearingNodeIterator<T:ISystemNode> extends NodeIterator<T>
 	{
 		if (!_skipIteration)
 		{
-			current = cast current.next;
+			current = current != null ? cast current.next : null;
 			_findNext();
 		}
 		else
