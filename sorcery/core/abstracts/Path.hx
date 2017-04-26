@@ -72,11 +72,11 @@ abstract Path(String) from String to String
 
 		switch (this.charAt(0))
 		{
-			case ":": return entity.fullName + this;
+			case TO_COMPONENT: return entity.fullName + this;
 			case ROOT: return this;
 			case TO_GROUP: return resolveGroupPath(this, entity);
 			case TO_PARENT: return resolveParentsPath(this, entity);
-			default: return entity.group.fullName + "." + this;
+			default: return entity.group.fullName + TO_GROUP + this;
 		}
 	}
 	
