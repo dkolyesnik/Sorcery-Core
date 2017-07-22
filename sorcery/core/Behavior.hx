@@ -28,6 +28,7 @@ class Behavior extends Component implements IBehavior implements HaxeContracts
         _handlers = [];
     }
     
+	@:access(sorcery.core.interfaces.ICore)
     function createLink(path:Path):IEntityChildLink
 	{
 		Contract.requires(Path.validate(path));
@@ -35,7 +36,7 @@ class Behavior extends Component implements IBehavior implements HaxeContracts
 		Contract.ensures(len +1 == _links.length);
 		
 		//TODO move link creation to factory
-		var link:ILinkInternal = new EntityChildLink(this, path);
+		var link:ILinkInternal = core.createLink(this, path); 
 		_links.push(link);
 		
 		if (_isAddedToRoot)

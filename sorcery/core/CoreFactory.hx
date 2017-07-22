@@ -13,6 +13,7 @@ import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.IEntityGroup;
 import sorcery.core.interfaces.IEntityRoot;
 import sorcery.core.interfaces.INotificator;
+import sorcery.core.interfaces.IEntityChild;
 import sorcery.core.interfaces.ITime;
 import sorcery.core.misc.Pool;
 
@@ -55,7 +56,7 @@ class CoreFactory implements ICoreFactory
 	{
 		return new EntityRoot(_core);
 	}
-
+	
 	private var _nameCount : Int = 0;
 	public function generateName() : String
 	{

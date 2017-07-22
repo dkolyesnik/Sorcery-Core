@@ -2,12 +2,13 @@ package sorcery.core;
 
 import sorcery.core.abstracts.FullName;
 import sorcery.core.abstracts.Path;
-import sorcery.core.interfaces.IComponent;
+import sorcery.core.interfaces.IBehavior;
 import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.IEntityChild;
 import sorcery.core.interfaces.IEntityChildLink;
 import sorcery.core.interfaces.ILinkInternal;
+import sorcery.core.links.LinkResolver;
 import haxecontracts.Contract;
 import haxecontracts.HaxeContracts;
 import sorcery.macros.Nullsafety.*;
@@ -20,16 +21,19 @@ class EntityChildLink implements IEntityChildLink implements ILinkInternal imple
 {
 	public var fullName(get, null):String;
 	var _path:Path;
-	var _owner:IComponent;
-	public function new(owner:IComponent, path:Path)
+	var _owner:IBehavior;
+	var _resolver:LinkResolver;
+	public function new(owner:IBehavior, path:Path, resolver:LinkResolver )
 	{
-		Contract.requires(owner != null && Path.validate(path));
-		
+		Contract.requires(owner != null && Path.validate(path) && resolver != null);
+		//TODO do we need path?
+
+		_resolver = resolver;
 		_path = path;
 		_owner = owner;
 	}
 	
-	public function get_fullName():String
+	public function get_fullName():FullName
 	{
 		return fullName;
 	}
@@ -45,12 +49,13 @@ class EntityChildLink implements IEntityChildLink implements ILinkInternal imple
 	{
 		Contract.ensures(FullName.validate(fullName));
 
-		fullName = _path.toFullName(_owner.parent);
+		fullName = _resolver.resolveToFullName(_owner.parent);
+		// fullName = _path.toFullName(_owner.parent);
 	}
 
 	function reset():Void
 	{
-		fullName = null;
+		fullName = FullName.UNDEFINED;
 	}
 	/* INTERFACE bgcore.interfaces.IEntityChildLink */
 

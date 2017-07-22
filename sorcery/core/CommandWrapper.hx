@@ -32,6 +32,7 @@ class CommandWrapper extends HandlerData implements ICommand
 	var _command:ICommand;
 	public function new(command:ICommand) 
 	{
+		super();
 		_command = command;
 	}
 	
@@ -51,4 +52,9 @@ class CommandWrapper extends HandlerData implements ICommand
 		_command.getHandler().activate(event:IEvent)
 		//or here
 	}
+	
+	function clearManager():Void {
+		
+	}
+	
 }

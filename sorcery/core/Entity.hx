@@ -8,10 +8,8 @@ import sorcery.core.abstracts.Agenda;
 import sorcery.core.abstracts.ComponentName;
 import sorcery.core.abstracts.EntityName;
 import sorcery.core.abstracts.FullName;
-import sorcery.core.interfaces.IAgendaChild;
 import sorcery.core.interfaces.IAgendaManager;
 import sorcery.core.interfaces.ICloneable;
-import sorcery.core.interfaces.IComponent;
 import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.IEntity;
 import haxecontracts.Contract;
@@ -20,7 +18,6 @@ import haxecontracts.HaxeContracts;
 import sorcery.core.interfaces.IEntityChild;
 import sorcery.core.interfaces.IEntityGroup;
 import sorcery.core.interfaces.IEvent;
-import sorcery.core.interfaces.INotificator;
 import sorcery.core.interfaces.IPool;
 import sorcery.core.interfaces.IPoolable;
 
@@ -37,12 +34,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 {
 	@:noCompletion
 	inline static var DUPLICATED_CHILD_NAME_EXCEPTIOM = "Error adding child with dublicated names";
-	/**
-	 * full name of the entity, unique identifier with consists of the groups's full name plus entity name
-	 * it looks like #.group1.group2.name
-	 * if entity is not added to root it's full name is null (? maybe it would be better to use something else ?)
-	 */
-	public var fullName(get, never) : String;
+	
 	public var group(get, null) : IEntityGroup;
 	public var agenda(get, never) : IAgendaManager;
 	@:isVar
@@ -107,7 +99,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		return group;
 	}
 
-	function get_fullName():String
+	override function get_fullName():FullName
 	{
 		if (_isAddedToRoot)
 			return group.fullName + "." + name;

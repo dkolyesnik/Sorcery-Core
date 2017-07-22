@@ -2,6 +2,7 @@
  * Created by Dmitriy Kolesnik on 26.08.2016.
  */
 package sorcery.core.interfaces;
+import sorcery.core.abstracts.FullName;
 import sorcery.core.interfaces.ICore;
 
 @:allow(sorcery.core.interfaces.IEntity)
@@ -11,6 +12,8 @@ interface IEntityChild extends IAgendaChild
 	var core(get, null):ICore;
 	var parent(get, null) : IEntity;
 	var name(get, null) : String;
+	var fullName(get, never) : FullName;
+
 	
 	function isEntity():Bool;
 	function isActivated():Bool;

@@ -9,6 +9,9 @@ abstract FullName(String) from String to String
 {
 	//var str = "^#(\\.[A-Z0-9]+)*(\\.\\$[A-Z][A-Z0-9]*)?$";
 	inline public static var EREG = Path.ROOT+"(\\."+EntityName.EREG + ")*(\\:"+ComponentName.EREG+")?";
+
+	inline public static var UNDEFINED:FullName = null;
+
 	inline public function new(value:String)
 	{
 		this = value;

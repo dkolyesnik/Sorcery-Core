@@ -1,6 +1,7 @@
 package sorcery.core;
 import sorcery.core.BaseAgenda;
 import sorcery.core.abstracts.Agenda;
+import sorcery.core.abstracts.FullName;
 import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.IEntity;
 import haxecontracts.Contract;
@@ -33,6 +34,12 @@ class EntityChild implements IEntityChild implements HaxeContracts implements II
 	public var core(get, null):ICore;
 	public var parent(get, null):IEntity;
 	public var name(get, null):String;
+	/**
+	 * full name of the entity, unique identifier with consists of the groups's full name plus entity name
+	 * it looks like #.group1.group2.name
+	 * if entity is not added to root it's full name is null (? maybe it would be better to use something else ?)
+	 */
+	public var fullName(get, never) : FullName;
 
 	// ==============================================================================
 	// GETTERS & SETTERS
@@ -50,6 +57,14 @@ class EntityChild implements IEntityChild implements HaxeContracts implements II
 	function get_name():String
 	{
 		return name;
+	}
+	
+	function get_fullName():FullName
+	{
+		if (_isAddedToRoot)
+			return parent.fullName + ":" + name;
+		else
+			return null;
 	}
 
 	// ==============================================================================

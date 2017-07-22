@@ -4,14 +4,14 @@
 package sorcery.core;
 import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.ICoreFactory;
-import sorcery.core.interfaces.IBundle;
-import sorcery.core.interfaces.ICorePluginManager;
 import sorcery.core.interfaces.IEntity;
-import sorcery.core.interfaces.IEntityGroup;
+import sorcery.core.interfaces.IBehavior;
 import sorcery.core.interfaces.IEntityRoot;
 import sorcery.core.interfaces.IFramework;
 import sorcery.core.interfaces.INotificator;
 import sorcery.core.interfaces.ITime;
+import sorcery.core.links.LinkResolver;
+import sorcery.core.abstracts.Path;
 import haxecontracts.Contract;
 import haxecontracts.HaxeContracts;
 
@@ -27,6 +27,8 @@ class Core implements ICore implements HaxeContracts
 	var factory(get, null) : ICoreFactory;
 
 	var _bundlesEntity:IEntity;
+
+	var _pathToLinkResolver:Map<Path, LinkResolver>;
 	
     public function new(?p_factory:ICoreFactory)
     {
@@ -40,6 +42,8 @@ class Core implements ICore implements HaxeContracts
     
     function _initialize() : ICore
     {
+		_pathToLinkResolver = new Map();
+
         factory.initialize(this);
 
         _createAll();
@@ -49,6 +53,18 @@ class Core implements ICore implements HaxeContracts
 		
         return this;
     }
+
+	function createLink(owner:IBehavior, path:Path):EntityChildLink {
+		Contract.requires(owner != null && Path.validate(path));
+
+		var resolver = _pathToLinkResolver[path];
+		if(resolver == null)
+		{
+			resolver = path.ToResolver();
+			_pathToLinkResolver[path] = resolver;
+		}
+		return new EntityChildLink(owner, path, resolver);
+	}
 	
 	public function addBundles(pack:Array<Bundle>):Void
 	{

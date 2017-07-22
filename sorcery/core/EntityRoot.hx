@@ -24,7 +24,7 @@ import sorcery.macros.Nullsafety.*;
 
 class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContracts
 {
-	var childrenByFullName = new Map<String,IEntityChild>();
+	var childrenByFullName = new Map<FullName, IEntityChild>();
 	var nodesByName = new Map<String, NodeList>();
 	
 	
@@ -38,6 +38,7 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 		super(_wrappedEntity);
 	}
 	
+	//TODO move nodes to Core
 	public function getNodes(nodeName:String):NodeList
 	{
 		return _findOrCreateNodeList(nodeName);
@@ -69,7 +70,7 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 		}
 	}
 	
-	public function findChildByFullName(p_name:String):IEntityChild
+	public function findChildByFullName(p_name:FullName):IEntityChild
 	{
 		Contract.requires(FullName.validate(p_name));
 		
@@ -92,9 +93,9 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 		return null;
 	}
 
-	function _findChildByFullName(p_name:String):IEntityChild
+	function _findChildByFullName(p_name:FullName):IEntityChild
 	{
-		if (p_name == null || p_name == "")
+		if (p_name == FullName.UNDEFINED || p_name == "")
 			return null;
 		if (p_name == ROOT)
 			return this;
@@ -130,33 +131,12 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 			{
 				entityName += c;
 			}
-			//if (groupsAr.length > 0)
-			//{
-				//var entity:IEntity =  this;
-				//var gr:IEntityGroup;
-				////for (i in 1...groupsAr.length)
-				////{
-					////var childName = groupsAr[i];
-					////if (childName.charAt(0) == "$")
-					////{
-						////return entity.findChild(childName);
-					////}
-					////else
-					////{
-						////if (entity == null || !(entity is IEntityGroup))
-							////return null;
-						////gr = cast entity;
-						////entity = gr.findEntity(childName);
-					////}
-				////}
-				//return entity;
-			//}
 		}
 		
 		return gr.findEntity(entityName);
 	}
 
-	public function clearCachedChild(p_name:String):Void
+	public function clearCachedChild(p_name:FullName):Void
 	{
 		Contract.requires(p_name != null && p_name != "");
 		Contract.ensures(!childrenByFullName.exists(p_name));
@@ -169,7 +149,7 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 		return this;
 	}
 	
-	override function get_fullName():String 
+	override function get_fullName():FullName
 	{
 		return ROOT;
 	}
