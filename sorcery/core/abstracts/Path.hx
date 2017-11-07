@@ -60,8 +60,8 @@ abstract Path(String) from String to String
 	*     @.:comp = entity.parent.group.asEntity().findChild("comp")
 	*
 	* */
-	public function toResolver():LinkResolver {
-		if (s.charAt(0) == ROOT)
+	public function toResolver():ILinkResolver {
+		if (this.charAt(0) == ROOT)
 			return new FullNameLinkResolver(this);
 		else
 			return createResolver(this);
@@ -75,7 +75,7 @@ abstract Path(String) from String to String
 			if (c == TO_GROUP)
 			{
 				if(name.length > 0)
-					return new EntityLinkResolver(name, new GroupLinkResolver(createResolver(s.substr(i+1)) );	
+					return new EntityLinkResolver(name, new GroupLinkResolver(createResolver(s.substr(i+1)) ));	
 				else
 					return new GroupLinkResolver(createResolver(s.substr(i+1)));
 			} else if(c == TO_COMPONENT) {

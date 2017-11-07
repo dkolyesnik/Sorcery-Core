@@ -8,9 +8,9 @@ import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.IBehavior;
 import sorcery.core.interfaces.IEntityRoot;
 import sorcery.core.interfaces.IFramework;
+import sorcery.core.interfaces.ILinkResolver;
 import sorcery.core.interfaces.INotificator;
 import sorcery.core.interfaces.ITime;
-import sorcery.core.links.LinkResolver;
 import sorcery.core.abstracts.Path;
 import haxecontracts.Contract;
 import haxecontracts.HaxeContracts;
@@ -28,7 +28,7 @@ class Core implements ICore implements HaxeContracts
 
 	var _bundlesEntity:IEntity;
 
-	var _pathToLinkResolver:Map<Path, LinkResolver>;
+	var _pathToLinkResolver:Map<Path, ILinkResolver>;
 	
     public function new(?p_factory:ICoreFactory)
     {
@@ -60,7 +60,7 @@ class Core implements ICore implements HaxeContracts
 		var resolver = _pathToLinkResolver[path];
 		if(resolver == null)
 		{
-			resolver = path.ToResolver();
+			resolver = path.toResolver();
 			_pathToLinkResolver[path] = resolver;
 		}
 		return new EntityChildLink(owner, path, resolver);

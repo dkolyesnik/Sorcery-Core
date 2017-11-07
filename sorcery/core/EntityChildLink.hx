@@ -8,9 +8,9 @@ import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.IEntityChild;
 import sorcery.core.interfaces.IEntityChildLink;
 import sorcery.core.interfaces.ILinkInternal;
-import sorcery.core.links.LinkResolver;
 import haxecontracts.Contract;
 import haxecontracts.HaxeContracts;
+import sorcery.core.interfaces.ILinkResolver;
 import sorcery.macros.Nullsafety.*;
 using sorcery.core.tools.EntityChildTools;
 /**
@@ -22,8 +22,8 @@ class EntityChildLink implements IEntityChildLink implements ILinkInternal imple
 	public var fullName(get, null):String;
 	var _path:Path;
 	var _owner:IBehavior;
-	var _resolver:LinkResolver;
-	public function new(owner:IBehavior, path:Path, resolver:LinkResolver )
+	var _resolver:ILinkResolver;
+	public function new(owner:IBehavior, path:Path, resolver:ILinkResolver )
 	{
 		Contract.requires(owner != null && Path.validate(path) && resolver != null);
 		//TODO do we need path?

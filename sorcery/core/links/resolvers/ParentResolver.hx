@@ -6,7 +6,6 @@ import sorcery.core.abstracts.FullName;
 import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.IEntity;
 import sorcery.core.interfaces.ILinkResolver;
-import sorcery.core.links.LinkResolver;
 import sorcery.macros.Nullsafety.*;
 /**
  * ...
