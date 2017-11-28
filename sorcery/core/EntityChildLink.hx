@@ -23,6 +23,7 @@ class EntityChildLink implements IEntityChildLink implements ILinkInternal imple
 	var _path:Path;
 	var _owner:IBehavior;
 	var _resolver:ILinkResolver;
+
 	public function new(owner:IBehavior, path:Path, resolver:ILinkResolver )
 	{
 		Contract.requires(owner != null && Path.validate(path) && resolver != null);
