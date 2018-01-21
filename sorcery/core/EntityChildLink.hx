@@ -24,12 +24,12 @@ class EntityChildLink implements IEntityChildLink implements ILinkInternal imple
 	var _owner:IBehavior;
 	var _resolver:ILinkResolver;
 
-	public function new(owner:IBehavior, path:Path, resolver:ILinkResolver )
+	public function new(owner:IBehavior, path:Path)
 	{
-		Contract.requires(owner != null && Path.validate(path) && resolver != null);
+		Contract.requires(owner != null && Path.validate(path));
 		//TODO do we need path?
 
-		_resolver = resolver;
+		_resolver = owner.core.factory.getResolver(path);
 		_path = path;
 		_owner = owner;
 	}
@@ -50,8 +50,7 @@ class EntityChildLink implements IEntityChildLink implements ILinkInternal imple
 	{
 		Contract.ensures(FullName.validate(fullName));
 
-		fullName = _resolver.resolveToFullName(_owner.parent);
-		// fullName = _path.toFullName(_owner.parent);
+		fullName = _resolver.resolve(_owner.parent);
 	}
 
 	function reset():Void

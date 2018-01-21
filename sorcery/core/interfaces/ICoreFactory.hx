@@ -3,9 +3,8 @@
  */
 package sorcery.core.interfaces;
 
-import sorcery.core.interfaces.IAgendaManager;
+import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.ICore;
-import sorcery.core.interfaces.IEntityChild;
 
 interface ICoreFactory
 {
@@ -24,6 +23,8 @@ interface ICoreFactory
     function allocateEntity() : IEntity;
     
     function wrapInGroup(entity:IEntity) : IEntity;
+	
+	function getResolver(path:Path):ILinkResolver;
 	
 }
 

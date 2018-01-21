@@ -54,18 +54,6 @@ class Core implements ICore implements HaxeContracts
         return this;
     }
 
-	function createLink(owner:IBehavior, path:Path):EntityChildLink {
-		Contract.requires(owner != null && Path.validate(path));
-
-		var resolver = _pathToLinkResolver[path];
-		if(resolver == null)
-		{
-			resolver = path.toResolver();
-			_pathToLinkResolver[path] = resolver;
-		}
-		return new EntityChildLink(owner, path, resolver);
-	}
-	
 	public function addBundles(pack:Array<Bundle>):Void
 	{
 		//adding as a child, so bundle will have core access

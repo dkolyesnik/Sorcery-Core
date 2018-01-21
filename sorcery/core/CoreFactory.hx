@@ -3,17 +3,15 @@
  */
 package sorcery.core;
 
-import sorcery.core.interfaces.IAgendaManager;
+import sorcery.core.abstracts.Path;
 import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.ICoreFactory;
 import sorcery.core.interfaces.IFramework;
+import sorcery.core.interfaces.ILinkResolver;
 import sorcery.core.interfaces.IPool;
-import sorcery.core.interfaces.IPoolable;
 import sorcery.core.interfaces.IEntity;
-import sorcery.core.interfaces.IEntityGroup;
 import sorcery.core.interfaces.IEntityRoot;
 import sorcery.core.interfaces.INotificator;
-import sorcery.core.interfaces.IEntityChild;
 import sorcery.core.interfaces.ITime;
 import sorcery.core.misc.Pool;
 
@@ -21,9 +19,11 @@ class CoreFactory implements ICoreFactory
 {
 	var _core : ICore;
 	var _entityPool : IPool;
+	var _pathToResolver:Map<Path, ILinkResolver>;
 
 	public function new()
 	{
+		_pathToResolver = new Map();
 	}
 
 	public function initialize(p_core : ICore) : Void
@@ -77,6 +77,17 @@ class CoreFactory implements ICoreFactory
 	public function wrapInGroup(entity:IEntity) : IEntity
 	{
 		return new EntityGroup(entity);
+	}
+	
+	public function getResolver(path:Path):ILinkResolver
+	{
+		var resolver = _pathToResolver[path];
+		if (resolver == null)
+		{
+			resolver = path;
+			_pathToResolver[path] = resolver;
+		}
+		return resolver;
 	}
 
 	function _createEntityPool() : IPool

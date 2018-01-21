@@ -105,12 +105,13 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 		var entityName = "";
 		var entity:IEntity;
 		var gr:IEntityGroup = this;
-		if (p_name.charAt(1) == TO_COMPONENT)
-			return findChild(p_name.substr(2));
+		var n:String = p_name;
+		if (n.charAt(1) == TO_COMPONENT)
+			return findChild(n.substr(2));
 			
-		for (i in 2...p_name.length)
+		for (i in 2...n.length)
 		{
-			var c = p_name.charAt(i);
+			var c = n.charAt(i);
 			if (c == TO_GROUP)
 			{
 				entity = gr.findEntity(entityName);
@@ -125,7 +126,7 @@ class EntityRoot extends EntityGroup implements IEntityRoot implements HaxeContr
 			else if (c == TO_COMPONENT)
 			{
 				entity = gr.findEntity(entityName);
-				return safeGet(entity.findChild(p_name.substr(i + 1)));
+				return safeGet(entity.findChild(n.substr(i + 1)));
 			}
 			else
 			{

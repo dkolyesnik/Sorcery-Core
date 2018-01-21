@@ -18,9 +18,9 @@ abstract Path(String) from String to String
 	inline public static var TO_GROUP = ".";
 	inline public static var TO_COMPONENT = ":";
 	
-	inline static var SEARCH_ENTITY_IN_PARENT = "^[@]*(" + EntityName.EREG + ")?$";
-	inline static var SEARCH_COMP_IN_PARENT = "^[@]*\\:" + ComponentName.EREG + "$";
-	inline static var SEARCH_IN_GROUP = "^[\\.]*(\\." + EntityName.EREG + ")*(\\:" + ComponentName.EREG + ")?$";
+	inline static var PATH_TO_ENTITY_IN_PARENT_EREG = "^[@]*(" + EntityName.EREG + ")?$";
+	inline static var PATH_TO_COMP_IN_PARENT_EREG = "^[@]*\\:" + ComponentName.EREG + "$";
+	inline static var PATH_TO_ENTITY_IN_GROUP_EREG = "^[\\.]*(\\." + EntityName.EREG + ")*(\\:" + ComponentName.EREG + ")?$";
 	
 	//static var ereg = ~/^[\w-\.]{2,}@[\w-\.]{2,}\.[a-z]{2,6}$/i;
 	inline public function new(s:String)
@@ -35,9 +35,9 @@ abstract Path(String) from String to String
 		}
 		return  value != null &&
 				(FullName.validate(value) 
-				|| check(SEARCH_ENTITY_IN_PARENT)
-				|| check(SEARCH_COMP_IN_PARENT)
-				|| check(SEARCH_IN_GROUP)
+				|| check(PATH_TO_ENTITY_IN_PARENT_EREG)
+				|| check(PATH_TO_COMP_IN_PARENT_EREG)
+				|| check(PATH_TO_ENTITY_IN_GROUP_EREG)
 				);
 	}
 
@@ -50,7 +50,7 @@ abstract Path(String) from String to String
 	* 		player - search entity by name in current group
 	*      :comp - search child in current entity, equal to entity.findChild("comp")
 	*  	player:comp = entity.group.findEntity("player").findChild("comp")
-	*      .player:comp  - this would be equal to entity.group.group.findEntity("player").findChild("comp")
+	*      ..player:comp  - this would be equal to entity.group.group.findEntity("player").findChild("comp")
 	*  	
 	* 3) reletive path by parents ie parent of the parent and so on
 	*     each @ meens up one parent 
@@ -60,6 +60,7 @@ abstract Path(String) from String to String
 	*     @.:comp = entity.parent.group.asEntity().findChild("comp")
 	*
 	* */
+	@:to
 	public function toResolver():ILinkResolver {
 		if (this.charAt(0) == ROOT)
 			return new FullNameLinkResolver(this);
@@ -95,30 +96,8 @@ abstract Path(String) from String to String
 		}
 		return null;
 	}
-	
-	static function createGroupResolver(s:String):GroupLinkResolver{
-		var group = entity.group;
-		for (i in 1...s.length)
-		{
-			var c = s.charAt(i);
-			if (c == TO_GROUP)
-			{
-				if (group.name == ROOT)
-					return null;
-				group = group.parentGroup;
-			}
-			//else if (c == TO_COMPONENT)
-			//{
-				//return group.fullName + s.substr(i);
-			//}
-			else
-			{
-				return group.fullName + s.substr(i);
-			}
-		}
-		return null;
-	}
-	
+		
+	/* depricated
 	public function toFullName(entity:IEntity):String
 	{
 		if (this.length == 0)
@@ -181,5 +160,6 @@ abstract Path(String) from String to String
 		}
 		return null;
 	}
+	*/
 }
 

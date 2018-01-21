@@ -1,4 +1,4 @@
-package;
+package sorcery.core.links.resolvers;
 
 import haxecontracts.Contract;
 import haxecontracts.HaxeContracts;

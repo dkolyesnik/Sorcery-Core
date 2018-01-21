@@ -1,4 +1,4 @@
-package;
+package sorcery.core.links.resolvers;
 import haxecontracts.Contract;
 import haxecontracts.HaxeContracts;
 import sorcery.core.interfaces.IEntity;
@@ -24,7 +24,7 @@ class GroupLinkResolver implements ILinkResolver implements HaxeContracts{
 	public function resolve(entity:IEntity):FullName {
 		Contract.requires(entity != null && entity.isAddedToRoot());
 	
-		return _next == null ? entity.group.fullName : _next.resolve(entity.group);
+		return _next == null ? entity.group.fullName : _next.resolve(cast entity.group);
 	}
 	
 }

@@ -4,7 +4,6 @@
 package sorcery.core.interfaces;
 
 import sorcery.core.Bundle;
-import sorcery.core.interfaces.IAgendaManager;
 
 @:allow(sorcery.core.interfaces.ITime)
 interface ICore
@@ -19,9 +18,10 @@ interface ICore
     
 	@:allow(sorcery.core.interfaces.IEntity)
 	@:allow(sorcery.core.interfaces.IBehavior)
-    private var notificator(get, null) : INotificator;    
-    
+    private var notificator(get, null) : INotificator;  
+	
 	@:allow(sorcery.core.interfaces.IEntity)
+	@:allow(sorcery.core.interfaces.IEntityChildLink)
     private var factory(get, null) : ICoreFactory;    
 
     function allocateEntity(?name:String) : IEntity;
