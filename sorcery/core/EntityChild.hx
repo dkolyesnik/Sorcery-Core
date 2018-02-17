@@ -148,6 +148,10 @@ class EntityChild implements IEntityChild implements HaxeContracts implements II
 				_agendas[p_agenda] = true;
 			}
 		}
+		else
+		{
+			//TODO warning
+		}
 		
 		return this;
 	}
@@ -164,6 +168,10 @@ class EntityChild implements IEntityChild implements HaxeContracts implements II
 			{
 				_agendas.remove(p_agenda);
 			}
+		}
+		else
+		{
+			//TODO warning
 		}
 	}
 	

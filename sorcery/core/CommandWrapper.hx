@@ -23,9 +23,9 @@ import sorcery.core.interfaces.IEvent;
   * rule can be done the other way. Make SimpleCommand (Command) 
   * and CommandWithRules witch would have rules that will be called befor to verify if
   * we can call command 
-  * and after to do some-thing
+  * and after that do something
   * Rules can be used even as some sort of adapter to adapt event to other type of
-  * event
+  * event, i.e. it can convert one type of event to the other type that command require
   * */
 class CommandWrapper extends HandlerData implements ICommand
 {
@@ -48,9 +48,9 @@ class CommandWrapper extends HandlerData implements ICommand
 	
 	override public function activate(event:IEvent):Void 
 	{
-		//override to do some-thing here
+		//override to do something before activation
 		_command.getHandler().activate(event:IEvent)
-		//or here
+		//or after activation
 	}
 	
 	function clearManager():Void {

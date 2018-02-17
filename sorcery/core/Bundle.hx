@@ -3,13 +3,9 @@
  */
 package sorcery.core;
 import sorcery.core.Behavior;
-import sorcery.core.abstracts.EventType;
 import sorcery.core.interfaces.IEntity;
 
-import sorcery.core.abstracts.Path;
-import sorcery.core.interfaces.ICore;
 import sorcery.core.interfaces.IBundle;
-import sorcery.core.interfaces.IEntityChildLink;
 import sorcery.core.misc.Pair;
 
 typedef WaitForInit = Pair<Array<String>, Void->Void>;

@@ -3,13 +3,9 @@
  */
 package sorcery.core;
 
-import sorcery.core.abstracts.EventType;
 import sorcery.core.abstracts.Priority;
 import sorcery.core.interfaces.IEntityChildLink;
-import haxe.Constraints.Function;
 import sorcery.core.interfaces.IEvent;
-import haxecontracts.Contract;
-import haxecontracts.HaxeContracts;
 
 class HandlerData
 {

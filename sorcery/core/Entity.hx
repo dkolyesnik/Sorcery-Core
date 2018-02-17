@@ -176,7 +176,7 @@ class Entity extends sorcery.core.EntityChild implements IEntity implements IPoo
 		_children.push(child);
 		child.addToParent(this);
 
-		//update useByAgendaCound
+		//update useByAgendaCount
 		for (agendaName in _activeAgendas)
 			child.activateByAgenda(agendaName);
 
